@@ -1,3 +1,13 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Файл с настройками проекта ###
+/src/main/resources/bot.properties
+
+### Maven ###
 target/
 pom.xml.tag
 pom.xml.releaseBackup
