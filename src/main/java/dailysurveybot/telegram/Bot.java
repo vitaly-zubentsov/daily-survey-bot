@@ -1,11 +1,11 @@
-package daylysurveybot.telegram;
+package dailysurveybot.telegram;
 
-import daylysurveybot.telegram.command.operation.GreetingsCommand;
-import daylysurveybot.telegram.command.services.HelpCommand;
-import daylysurveybot.telegram.command.services.SettingsCommand;
-import daylysurveybot.telegram.command.services.StartCommand;
-import daylysurveybot.telegram.noncommand.NonCommand;
-import daylysurveybot.telegram.noncommand.Settings;
+import dailysurveybot.telegram.command.operation.GreetingsCommand;
+import dailysurveybot.telegram.command.services.HelpCommand;
+import dailysurveybot.telegram.command.services.SettingsCommand;
+import dailysurveybot.telegram.command.services.StartCommand;
+import dailysurveybot.telegram.noncommand.NonCommand;
+import dailysurveybot.telegram.noncommand.Settings;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;

@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.vitalyzubentsov</groupId>
-    <artifactId>daily-servey-bot</artifactId>
+    <groupId>com.vitalyzubentsov.dailysurveybot</groupId>
+    <artifactId>daily-survey-bot</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

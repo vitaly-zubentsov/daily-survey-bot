@@ -1,8 +1,8 @@
-package daylysurveybot.telegram.command.services;
+package dailysurveybot.telegram.command.services;
 
-import daylysurveybot.Utils;
-import daylysurveybot.telegram.Bot;
-import daylysurveybot.telegram.noncommand.Settings;
+import dailysurveybot.Utils;
+import dailysurveybot.telegram.Bot;
+import dailysurveybot.telegram.noncommand.Settings;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;

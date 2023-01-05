@@ -1,7 +1,7 @@
-package daylysurveybot.telegram.noncommand;
+package dailysurveybot.telegram.noncommand;
 
 
-import daylysurveybot.telegram.Bot;
+import dailysurveybot.telegram.Bot;
 import org.apache.commons.lang3.StringUtils;
 
 public class NonCommand {

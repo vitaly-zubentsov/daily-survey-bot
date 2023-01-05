@@ -1,4 +1,4 @@
-package daylysurveybot;
+package dailysurveybot;
 
 import org.telegram.telegrambots.meta.api.objects.User;
 

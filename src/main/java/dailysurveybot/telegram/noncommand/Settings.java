@@ -1,4 +1,4 @@
-package daylysurveybot.telegram.noncommand;
+package dailysurveybot.telegram.noncommand;
 
 import com.google.common.base.Objects;
 

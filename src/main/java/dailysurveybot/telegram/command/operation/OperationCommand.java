@@ -1,4 +1,4 @@
-package daylysurveybot.telegram.command.operation;
+package dailysurveybot.telegram.command.operation;
 
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
