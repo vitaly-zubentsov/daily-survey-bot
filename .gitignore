@@ -5,7 +5,7 @@
 *.ipr
 
 ### Файл с настройками проекта ###
-/src/main/resources/bot.properties
+application.properties
 
 ### Maven ###
 target/
