@@ -1,5 +1,6 @@
 package dailysurveybot.telegram.handlers;
 
+import dailysurveybot.notion.NotionService;
 import dailysurveybot.telegram.constants.BotMessageEnum;
 import dailysurveybot.telegram.constants.ButtonNameEnum;
 import dailysurveybot.telegram.entity.Settings;
@@ -21,11 +22,14 @@ public class MessageHandler {
 
     private final ReplyKeyboardMaker replyKeyboardMaker;
     private final InlineKeyboardMaker inlineKeyboardMaker;
+    private final NotionService notionServiceImpl;
 
     public MessageHandler(ReplyKeyboardMaker replyKeyboardMaker,
-                          InlineKeyboardMaker inlineKeyboardMaker) {
+                          InlineKeyboardMaker inlineKeyboardMaker,
+                          NotionService notionServiceImpl) {
         this.replyKeyboardMaker = replyKeyboardMaker;
         this.inlineKeyboardMaker = inlineKeyboardMaker;
+        this.notionServiceImpl = notionServiceImpl;
     }
 
     public BotApiMethod<? extends Serializable> answerMessage(Message message) {
@@ -38,8 +42,8 @@ public class MessageHandler {
             return getStartMessage(chatId);
         } else if (HELP_COMMAND.equals(inputText)) {
             return new SendMessage(chatId, getUserName(message.getFrom()) + BotMessageEnum.HELP_MESSAGE.getMessage());
-        } else if (ButtonNameEnum.GREETINGS_BUTTON.getButtonName().equals(inputText)) {
-            return getGreetingsMessage(message.getChatId());
+        } else if (ButtonNameEnum.SEND_NEW_ROW_TO_NOTION_BUTTON.getButtonName().equals(inputText)) {
+            return addRowMessage(message.getChatId());
         } else if (ButtonNameEnum.SETTING_BUTTON.getButtonName().equals(inputText)) {
             return getSettingMessage(chatId);
         } else {
@@ -54,9 +58,15 @@ public class MessageHandler {
         return sendMessage;
     }
 
-    private SendMessage getGreetingsMessage(Long chatId) {
+    private SendMessage addRowMessage(Long chatId) {
         final Settings settings = SettingsHandler.getUserSettings(chatId);
-        final SendMessage sendMessage = new SendMessage(chatId.toString(), settings.getHelloWorldAnswer());
+        final SendMessage sendMessage = new SendMessage(chatId.toString(), "таблица была обновлена");
+        try {
+            notionServiceImpl.saveRow(settings.getHelloWorldAnswer());
+        } catch (Exception e) {
+            sendMessage.setText("Ошибка при обновлениии таблиицы : " + e.getMessage());
+        }
+
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(replyKeyboardMaker.getMainMenuKeyboard());
         return sendMessage;

@@ -4,7 +4,7 @@ package dailysurveybot.telegram.constants;
  * Названия кнопок основной клавиатуры
  */
 public enum ButtonNameEnum {
-    GREETINGS_BUTTON("Поздороваться"),
+    SEND_NEW_ROW_TO_NOTION_BUTTON("Добавить строку"),
     SETTING_BUTTON("Настройки");
 
     private final String buttonName;

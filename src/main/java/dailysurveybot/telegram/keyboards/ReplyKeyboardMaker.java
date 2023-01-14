@@ -17,7 +17,7 @@ public class ReplyKeyboardMaker {
 
     public ReplyKeyboardMarkup getMainMenuKeyboard() {
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton(ButtonNameEnum.GREETINGS_BUTTON.getButtonName()));
+        row1.add(new KeyboardButton(ButtonNameEnum.SEND_NEW_ROW_TO_NOTION_BUTTON.getButtonName()));
 
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(ButtonNameEnum.SETTING_BUTTON.getButtonName()));

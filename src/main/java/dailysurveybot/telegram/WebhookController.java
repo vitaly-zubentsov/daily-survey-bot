@@ -18,4 +18,5 @@ public class WebhookController {
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
         return dailySurveyBot.onWebhookUpdateReceived(update);
     }
+
 }
