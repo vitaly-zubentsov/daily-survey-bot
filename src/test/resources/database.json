@@ -1,0 +1,82 @@
+{
+  "object": "database",
+  "id": "6ce91326-255c-4bff-8355-databaseId",
+  "cover": null,
+  "icon": null,
+  "created_time": "2021-10-20T07:33:00.000Z",
+  "created_by": {
+    "object": "user",
+    "id": "some-user"
+  },
+  "last_edited_by": {
+    "object": "user",
+    "id": "some-user"
+  },
+  "last_edited_time": "2022-01-14T09:59:00.000Z",
+  "title": [
+    {
+      "type": "text",
+      "text": {
+        "content": "Дневник",
+        "link": null
+      },
+      "annotations": {
+        "bold": false,
+        "italic": false,
+        "strikethrough": false,
+        "underline": false,
+        "code": false,
+        "color": "default"
+      },
+      "plain_text": "Дневник",
+      "href": null
+    }
+  ],
+  "description": [],
+  "is_inline": false,
+  "properties": {
+    "Время": {
+      "id": "%3Dexl",
+      "name": "Время",
+      "type": "created_time",
+      "created_time": {}
+    },
+    "Зарядка": {
+      "id": "MqVL",
+      "name": "Зарядка",
+      "type": "select",
+      "select": {
+        "options": [
+          {
+            "id": "vmcV",
+            "name": "да",
+            "color": "green"
+          },
+          {
+            "id": "7722fde0-4959-4335-a76f-2ab95f7eb1fe",
+            "name": "нет",
+            "color": "red"
+          }
+        ]
+      }
+    },
+    "Сон": {
+      "id": "eF%3AK",
+      "name": "Сон",
+      "type": "rich_text",
+      "rich_text": {}
+    },
+    "Что ты делал сегодня?": {
+      "id": "title",
+      "name": "Что ты делал сегодня?",
+      "type": "title",
+      "title": {}
+    }
+  },
+  "parent": {
+    "type": "workspace",
+    "workspace": true
+  },
+  "url": "https://www.notion.so/6ce913262d5c4bff83553fc311212ac9",
+  "archived": false
+}

@@ -1,26 +1,19 @@
 package dailysurveybot.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Component
-public class TelegramConfig {
-    @Value("${telegram.webhook-path}")
-    private String webhookPath;
-    @Value("${telegram.bot-name}")
-    private String botName;
-    @Value("${telegram.bot-token}")
-    private String botToken;
+/**
+ * Настройки для работы с api telegram
+ *
+ * @param webhookPath url вебхука, c которым взаимодействует api telegram
+ * @param botName     имя бота
+ * @param botToken    токен для доступа к функциям бота
+ * @param apiUrl      url api telegram
+ */
+@ConfigurationProperties("telegram")
+public record TelegramConfig(String webhookPath,
+                             String botName,
+                             String botToken,
+                             String apiUrl) {
 
-    public String getWebhookPath() {
-        return webhookPath;
-    }
-
-    public String getBotName() {
-        return botName;
-    }
-
-    public String getBotToken() {
-        return botToken;
-    }
 }

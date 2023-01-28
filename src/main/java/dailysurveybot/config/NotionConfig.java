@@ -1,26 +1,18 @@
 package dailysurveybot.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Component
-public class NotionConfig {
-    @Value("${notion.api-url}")
-    private String notionApiUrl;
-    @Value("${notion.api-token}")
-    private String notionApiToken;
-    @Value("${notion.database-id}")
-    private String notionDatabaseId;
-
-    public String getNotionApiUrl() {
-        return notionApiUrl;
-    }
-
-    public String getNotionApiToken() {
-        return notionApiToken;
-    }
-
-    public String getNotionDatabaseId() {
-        return notionDatabaseId;
-    }
+/**
+ * Настройки для работты с notion таблицами
+ *
+ * @param apiUrl     url для осуществления api запросов в notion
+ * @param apiToken   api токен, необходим для доступа к таблиицам
+ * @param databaseId уникальный идентификатор таблицы в сервиси notion
+ * @param apiVersion версия api
+ */
+@ConfigurationProperties("notion")
+public record NotionConfig(String apiUrl,
+                           String apiToken,
+                           String databaseId,
+                           String apiVersion) {
 }

@@ -4,8 +4,8 @@
 *.iml
 *.ipr
 
-### Файл с настройками проекта ###
-application.properties
+### Файл с секретными настройками проекта ###
+secrets.properties
 
 ### Maven ###
 target/

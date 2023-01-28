@@ -1,17 +1,21 @@
 package dailysurveybot.telegram.handlers;
 
 import dailysurveybot.notion.NotionService;
+import dailysurveybot.notion.model.Column;
 import dailysurveybot.telegram.constants.BotMessageEnum;
 import dailysurveybot.telegram.constants.ButtonNameEnum;
-import dailysurveybot.telegram.entity.Settings;
 import dailysurveybot.telegram.keyboards.InlineKeyboardMaker;
 import dailysurveybot.telegram.keyboards.ReplyKeyboardMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static dailysurveybot.Utils.getUserName;
 
@@ -20,6 +24,7 @@ public class MessageHandler {
     private static final String START_COMMAND = "/start";
     private static final String HELP_COMMAND = "/help";
 
+    private final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
     private final ReplyKeyboardMaker replyKeyboardMaker;
     private final InlineKeyboardMaker inlineKeyboardMaker;
     private final NotionService notionServiceImpl;
@@ -33,8 +38,8 @@ public class MessageHandler {
     }
 
     public BotApiMethod<? extends Serializable> answerMessage(Message message) {
-        final String chatId = message.getChatId().toString();
-        final String inputText = message.getText();
+        String chatId = message.getChatId().toString();
+        String inputText = message.getText();
 
         if (inputText == null) {
             throw new IllegalArgumentException();
@@ -59,21 +64,25 @@ public class MessageHandler {
     }
 
     private SendMessage addRowMessage(Long chatId) {
-        final Settings settings = SettingsHandler.getUserSettings(chatId);
-        final SendMessage sendMessage = new SendMessage(chatId.toString(), "таблица была обновлена");
+        //  Settings settings = SettingsHandler.getUserSettings(chatId);
+        SendMessage sendMessage = new SendMessage(chatId.toString(), "таблица была обновлена");
         try {
-            notionServiceImpl.saveRow(settings.getHelloWorldAnswer());
+            // notionServiceImpl.saveRow(settings.getHelloWorldAnswer());
+            List<Column> columns = notionServiceImpl.getColumns();
+            String text = columns.stream().map(Column::getName).collect(Collectors.joining(", "));
+            sendMessage.setText(text);
         } catch (Exception e) {
-            sendMessage.setText("Ошибка при обновлениии таблиицы : " + e.getMessage());
+            sendMessage.setText("Что то пошло не так. Я не могу получить имена столбоцов таблицы");
+            logger.error(e.getMessage());
         }
-
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(replyKeyboardMaker.getMainMenuKeyboard());
+
         return sendMessage;
     }
 
     private SendMessage getSettingMessage(String chatId) {
-        final SendMessage sendMessage = new SendMessage(chatId, BotMessageEnum.SETTINGS_MESSAGE.getMessage());
+        SendMessage sendMessage = new SendMessage(chatId, BotMessageEnum.SETTINGS_MESSAGE.getMessage());
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(inlineKeyboardMaker.getInlineMessageButtons());
         return sendMessage;

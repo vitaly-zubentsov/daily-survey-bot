@@ -5,6 +5,7 @@ import dailysurveybot.telegram.handlers.CallbackQueryHandler;
 import dailysurveybot.telegram.handlers.MessageHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 
 @Configuration
@@ -17,7 +18,7 @@ public class SpringConfig {
 
     @Bean
     public SetWebhook setWebhookInstance() {
-        return SetWebhook.builder().url(telegramConfig.getWebhookPath()).build();
+        return SetWebhook.builder().url(telegramConfig.webhookPath()).build();
     }
 
     @Bean
@@ -28,8 +29,13 @@ public class SpringConfig {
         return new DailySurveyBot(setWebhook,
                 messageHandler,
                 callbackQueryHandler,
-                telegramConfig.getWebhookPath(),
-                telegramConfig.getBotName(),
-                telegramConfig.getBotToken());
+                telegramConfig.webhookPath(),
+                telegramConfig.botName(),
+                telegramConfig.botToken());
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
