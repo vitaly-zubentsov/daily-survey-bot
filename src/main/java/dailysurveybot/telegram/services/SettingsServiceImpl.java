@@ -1,26 +1,27 @@
-package dailysurveybot.telegram.handlers;
+package dailysurveybot.telegram.services;
 
 import dailysurveybot.telegram.constants.SettingsEnum;
 import dailysurveybot.telegram.entity.Settings;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
-public class SettingsHandler {
+@Service
+public class SettingsServiceImpl implements SettingsService {
 
     private static final Settings DEFAULT_SETTINGS = new Settings(SettingsEnum.HI_PROGRAMMERS.getText());
     // Настройки файла для разных пользователей. Ключ - уникальный id чата
-    private static final Map<Long, Settings> userSettings = new HashMap<>();
+    private static final Map<Long, Settings> userSettings = new HashMap<>(); //TODO убрать потенциальная утечка памяти
 
-    public SendMessage setSettings(Long chatId, String text) {
+    @Override
+    public SendMessage setSettings(Long chatId, String helloWorldText) {
         String answer;
         try {
             final Settings settings = getUserSettings(chatId);
-            if (!text.equals(settings.getHelloWorldAnswer())) {
-                settings.setHelloWorldAnswer(text);
+            if (!helloWorldText.equals(settings.getHelloWorldAnswer())) {
+                settings.setHelloWorldAnswer(helloWorldText);
                 saveUserSettings(chatId, settings);
                 answer = "Настройки обновлены.";
             } else {

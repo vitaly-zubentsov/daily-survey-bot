@@ -1,7 +1,7 @@
 package dailysurveybot.telegram;
 
-import dailysurveybot.telegram.handlers.CallbackQueryHandler;
-import dailysurveybot.telegram.handlers.MessageHandler;
+import dailysurveybot.telegram.services.CallbackQueryService;
+import dailysurveybot.telegram.services.MessageService;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
@@ -12,34 +12,43 @@ import org.telegram.telegrambots.starter.SpringWebhookBot;
 
 import java.io.Serializable;
 
+/**
+ * Класс телеграмм бота
+ */
 public class DailySurveyBot extends SpringWebhookBot {
 
     private final String botPath;
     private final String botUsername;
     private final String botToken;
 
-    private final MessageHandler messageHandler;
-    private final CallbackQueryHandler callbackQueryHandler;
+    private final MessageService messageService;
+    private final CallbackQueryService callbackQueryHandler;
 
 
     public DailySurveyBot(SetWebhook setWebhook,
-                          MessageHandler messageHandler,
-                          CallbackQueryHandler callbackQueryHandler,
+                          MessageService messageService,
+                          CallbackQueryService callbackQueryHandler,
                           String botPath,
                           String botUsername,
                           String botToken) {
         super(setWebhook);
-        this.messageHandler = messageHandler;
+        this.messageService = messageService;
         this.callbackQueryHandler = callbackQueryHandler;
         this.botPath = botPath;
         this.botUsername = botUsername;
         this.botToken = botToken;
     }
 
+    /**
+     * обработка запроса от пользователя
+     *
+     * @param update объект телеграмм api
+     * @return ответ пользователю
+     */
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         try {
-            return handleUpdate(update);
+            return process(update);
         } catch (IllegalArgumentException e) {
             return new SendMessage(update.getMessage().getChatId().toString(),
                     "я работаю только с текстом");
@@ -64,14 +73,14 @@ public class DailySurveyBot extends SpringWebhookBot {
         return botToken;
     }
 
-    private BotApiMethod<? extends Serializable> handleUpdate(Update update) {
+    private BotApiMethod<? extends Serializable> process(Update update) {
         if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
             return callbackQueryHandler.processCallbackQuery(callbackQuery);
         } else {
             Message message = update.getMessage();
             if (message != null) {
-                return messageHandler.answerMessage(update.getMessage());
+                return messageService.answerMessage(update.getMessage());
             }
         }
         return null;

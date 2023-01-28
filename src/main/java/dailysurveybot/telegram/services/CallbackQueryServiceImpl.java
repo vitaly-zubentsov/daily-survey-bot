@@ -1,21 +1,22 @@
-package dailysurveybot.telegram.handlers;
+package dailysurveybot.telegram.services;
 
 import dailysurveybot.telegram.constants.SettingsEnum;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
 import java.io.Serializable;
 
-@Component
-public class CallbackQueryHandler {
+@Service
+public class CallbackQueryServiceImpl implements CallbackQueryService {
 
-    private final SettingsHandler settingsHandler;
+    private final SettingsService settingsHandler;
 
-    public CallbackQueryHandler(SettingsHandler settingsHandler) {
+    public CallbackQueryServiceImpl(SettingsService settingsHandler) {
         this.settingsHandler = settingsHandler;
     }
 
+    @Override
     public BotApiMethod<? extends Serializable> processCallbackQuery(CallbackQuery buttonQuery) {
         final Long chatId = buttonQuery.getMessage().getChatId();
 

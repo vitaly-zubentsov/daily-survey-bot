@@ -15,7 +15,7 @@ public class WebhookController {
     }
 
     @PostMapping("/")
-    public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
+    public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) { //todo разобораться почему wildcard
         return dailySurveyBot.onWebhookUpdateReceived(update);
     }
 

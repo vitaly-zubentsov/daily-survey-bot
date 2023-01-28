@@ -1,4 +1,4 @@
-package dailysurveybot.telegram.handlers;
+package dailysurveybot.telegram.services;
 
 import dailysurveybot.notion.NotionService;
 import dailysurveybot.notion.model.Column;
@@ -8,7 +8,7 @@ import dailysurveybot.telegram.keyboards.InlineKeyboardMaker;
 import dailysurveybot.telegram.keyboards.ReplyKeyboardMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -19,24 +19,25 @@ import java.util.stream.Collectors;
 
 import static dailysurveybot.Utils.getUserName;
 
-@Component
-public class MessageHandler {
+@Service
+public class MessageServiceImpl implements MessageService {
     private static final String START_COMMAND = "/start";
     private static final String HELP_COMMAND = "/help";
 
-    private final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(MessageServiceImpl.class);
     private final ReplyKeyboardMaker replyKeyboardMaker;
     private final InlineKeyboardMaker inlineKeyboardMaker;
-    private final NotionService notionServiceImpl;
+    private final NotionService notionService;
 
-    public MessageHandler(ReplyKeyboardMaker replyKeyboardMaker,
-                          InlineKeyboardMaker inlineKeyboardMaker,
-                          NotionService notionServiceImpl) {
+    public MessageServiceImpl(ReplyKeyboardMaker replyKeyboardMaker,
+                              InlineKeyboardMaker inlineKeyboardMaker,
+                              NotionService notionService) {
         this.replyKeyboardMaker = replyKeyboardMaker;
         this.inlineKeyboardMaker = inlineKeyboardMaker;
-        this.notionServiceImpl = notionServiceImpl;
+        this.notionService = notionService;
     }
 
+    @Override
     public BotApiMethod<? extends Serializable> answerMessage(Message message) {
         String chatId = message.getChatId().toString();
         String inputText = message.getText();
@@ -68,7 +69,7 @@ public class MessageHandler {
         SendMessage sendMessage = new SendMessage(chatId.toString(), "таблица была обновлена");
         try {
             // notionServiceImpl.saveRow(settings.getHelloWorldAnswer());
-            List<Column> columns = notionServiceImpl.getColumns();
+            List<Column> columns = notionService.getColumns();
             String text = columns.stream().map(Column::getName).collect(Collectors.joining(", "));
             sendMessage.setText(text);
         } catch (Exception e) {

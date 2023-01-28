@@ -1,8 +1,8 @@
 package dailysurveybot.config;
 
 import dailysurveybot.telegram.DailySurveyBot;
-import dailysurveybot.telegram.handlers.CallbackQueryHandler;
-import dailysurveybot.telegram.handlers.MessageHandler;
+import dailysurveybot.telegram.services.CallbackQueryServiceImpl;
+import dailysurveybot.telegram.services.MessageServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -23,11 +23,11 @@ public class SpringConfig {
 
     @Bean
     public DailySurveyBot springWebhookBot(SetWebhook setWebhook,
-                                           MessageHandler messageHandler,
-                                           CallbackQueryHandler callbackQueryHandler) {
+                                           MessageServiceImpl messageService,
+                                           CallbackQueryServiceImpl callbackQueryHandler) {
 
         return new DailySurveyBot(setWebhook,
-                messageHandler,
+                messageService,
                 callbackQueryHandler,
                 telegramConfig.webhookPath(),
                 telegramConfig.botName(),
