@@ -2,6 +2,9 @@ package dailysurveybot.telegram.entity;
 
 import com.google.common.base.Objects;
 
+/**
+ * Класс содержащий настройки и данные пользователя
+ */
 public class Settings {
 
     private String helloWorldAnswer;
