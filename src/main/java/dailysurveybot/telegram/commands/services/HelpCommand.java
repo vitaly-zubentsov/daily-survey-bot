@@ -19,6 +19,6 @@ public class HelpCommand extends ServiceCommand {
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         String userName = Utils.getUserName(user);
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
-                "А вот не придумал ещё мучайся");
+                "Вызываешь /t и заполняешь таблицу, чего непонятного то?");
     }
 }

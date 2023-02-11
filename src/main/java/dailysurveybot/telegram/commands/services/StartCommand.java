@@ -21,6 +21,6 @@ public class StartCommand extends ServiceCommand {
         String userName = Utils.getUserName(user);
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
-                "Давайте начнём! Если Вам нужна помощь, нажмите /help");
+                "Давайте начнём! Я заполняю таблицу в notion. Достаточно набрать команду /t. Если Вам нужна помощь, нажмите /help");
     }
 }

@@ -5,7 +5,7 @@ import dailysurveybot.telegram.commands.operations.AddRowToTableCommand;
 import dailysurveybot.telegram.commands.services.HelpCommand;
 import dailysurveybot.telegram.commands.services.SettingsCommand;
 import dailysurveybot.telegram.commands.services.StartCommand;
-import dailysurveybot.telegram.entity.Settings;
+import dailysurveybot.telegram.entity.UserData;
 import dailysurveybot.telegram.noncommands.NonCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,19 +29,14 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static final Settings defaultSettings = new Settings("Hello world!");
+    private static final UserData DEFAULT_USER_DATA = new UserData(new ArrayList<>(), new ArrayList<>(), 0);
 
-    // Настройки файла для разных пользователей. Ключ - уникальный id чата
-    private static Map<Long, Settings> userSettings;
+    // Данные пользователей. Ключ - уникальный id чата
+    private static final Map<Long, UserData> usersData = new HashMap<>();
 
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
-    private final TelegramConfig telegramConfig;
-    private final StartCommand startCommand;
-    private final SettingsCommand settingsCommand;
-    private final AddRowToTableCommand addRowToTableCommand;
-    private final HelpCommand helpCommand;
 
     public DailySurveyBot(TelegramConfig telegramConfig,
                           StartCommand startCommand,
@@ -48,24 +44,18 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
                           HelpCommand helpCommand,
                           AddRowToTableCommand addRowToTableCommand) {
         super();
-        this.telegramConfig = telegramConfig;
         this.botName = telegramConfig.botName();
         this.botToken = telegramConfig.botToken();
-        this.startCommand = startCommand;
-        this.settingsCommand = settingsCommand;
-        this.helpCommand = helpCommand;
-        this.addRowToTableCommand = addRowToTableCommand;
         this.nonCommand = new NonCommand();
-        userSettings = new HashMap<>();
 
         //регистрируем команды
-        register(this.startCommand);
+        register(startCommand);
         logger.debug("Команда start была зарегистрирована");
-        register(this.settingsCommand);
+        register(settingsCommand);
         logger.debug("Команда settings была зарегистрирована");
-        register(this.helpCommand);
+        register(helpCommand);
         logger.debug("Команда help была зарегистрирована");
-        register(this.addRowToTableCommand);
+        register(addRowToTableCommand);
         logger.debug("Команда AddRowToTableCommand(/t) была зарегистрирована");
 
         logger.debug("Бот был создан");
@@ -81,12 +71,8 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
         return botToken;
     }
 
-    public static Map<Long, Settings> getUserSettings() {
-        return userSettings;
-    }
-
-    public static Settings getDefaultSettings() {
-        return defaultSettings;
+    private static Map<Long, UserData> getUsersData() {
+        return usersData;
     }
 
     /**
@@ -105,13 +91,13 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
     /**
      * Получение настроек по id чата. Если ранее для этого чата в ходе сеанса работы бота настройки не были установлены, используются настройки по умолчанию
      */
-    public static Settings getUserSettings(Long chatId) {
-        Map<Long, Settings> userSettings = DailySurveyBot.getUserSettings();
-        Settings settings = userSettings.get(chatId);
-        if (settings == null) {
-            return defaultSettings;
+    public static UserData getUserData(Long chatId) {
+        Map<Long, UserData> usersData = DailySurveyBot.getUsersData();
+        UserData userData = usersData.get(chatId);
+        if (userData == null) {
+            return DEFAULT_USER_DATA;
         }
-        return settings;
+        return userData;
     }
 
     /**

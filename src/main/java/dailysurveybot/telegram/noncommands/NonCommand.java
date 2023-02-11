@@ -1,63 +1,59 @@
 package dailysurveybot.telegram.noncommands;
 
-
 import dailysurveybot.telegram.DailySurveyBot;
-import dailysurveybot.telegram.entity.Settings;
+import dailysurveybot.telegram.entity.UserData;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
+/**
+ * Обработка сообщения, не являющегося командой (т.е. обычного текста не начинающегося с "/")
+ * Используется для заполнения таблицы данными
+ */
+@Component
 public class NonCommand {
 
-    /**
-     * Обработка сообщения, не являющегося командой (т.е. обычного текста не начинающегося с "/")
-     */
     public String execute(Long chatId, String userName, String text) {
-        String answer;
+        String answerToUser;
         try {
-            //создаём настройки из сообщения пользователя
-            final Settings settings = createSettings(text);
-            //добавляем настройки в мапу, чтобы потом их использовать для этого пользователя при генерации файла
-            saveUserSettings(chatId, settings);
-            answer = "Настройки обновлены. Вы всегда можете их посмотреть с помощью /settings";
-            //TODO логируем событие, используя userName
+            UserData userData = DailySurveyBot.getUserData(chatId);
+            if (userData.getColumnsForFill().isEmpty()) {
+                answerToUser = "Для обновления таблицы введите /t";
+            } else {
+                addTextToValueForFill(text, userData);
+                userData.setFilledColumnsCounter(userData.getFilledColumnsCounter() + 1);
+                //TODO поэкспериментировать примитив в итоге локально обновленный будет ли изменияться в
+                // самом классе если нет то надо просто взятть обертку
+                int filledColumnsCounter = userData.getFilledColumnsCounter();
+                if (filledColumnsCounter > userData.getColumnsForFill().size()) {
+                    //todo send data to notion
+                    answerToUser = "таблица заполнена";
+                    userData.getColumnsForFill().clear();
+                    userData.setFilledColumnsCounter(1);
+                    userData.getValuesForFill().clear();
+                } else {
+                    answerToUser = userData.getColumnsForFill().get(filledColumnsCounter - 1);
+                }
+                //TODO логируем событие, используя userName
+            }
         } catch (RuntimeException e) {
             //TODO сделать exception именно для ошибки установки обработчик
-            answer = e.getMessage() +
+            answerToUser = e.getMessage() +
                     "\n\n Настройки не были изменены. Вы всегда можете их посмотреть с помощью /settings";
             //TODO логируем событие, используя userName
         } catch (Exception e) {
-            answer = "Простите, я не понимаю Вас. Возможно, Вам поможет /help";
+            answerToUser = "Простите, я не понимаю Вас. Возможно, Вам поможет /help";
             //TODO логируем событие, используя userName
         }
-        return answer;
+        return answerToUser;
     }
 
-    /**
-     * Создание настроек из полученного пользователем сообщения
-     *
-     * @param text текст сообщения
-     * @throws IllegalArgumentException пробрасывается, если сообщение пользователя не соответствует формату
-     */
-    private Settings createSettings(String text) throws IllegalArgumentException {
+
+    private void addTextToValueForFill(String text, UserData userData) {
         //отсекаем файлы, стикеры, гифки и прочий мусор
         if (StringUtils.isBlank(text)) {
             throw new IllegalArgumentException("Сообщение не является текстом");
         }
-        //создаём из сообщения пользователя 3 числа-настройки (min, max, listCount) либо пробрасываем исключение о несоответствии сообщения требуемому формату
-        return new Settings(text);
+        userData.getValuesForFill().add(text);
     }
 
-    /**
-     * Добавление настроек пользователя в мапу, чтобы потом их использовать для этого пользователя при генерации файла
-     * Если настройки совпадают с дефолтными, они не сохраняются, чтобы впустую не раздувать мапу
-     *
-     * @param chatId   id чата
-     * @param settings настройки
-     */
-    private void saveUserSettings(Long chatId, Settings settings) {
-        if (!DailySurveyBot.getDefaultSettings().equals(settings)) {
-            DailySurveyBot.getUserSettings().put(chatId, settings);
-        } else {
-            DailySurveyBot.getUserSettings().remove(chatId);
-        }
-    }
 }

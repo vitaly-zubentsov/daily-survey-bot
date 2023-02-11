@@ -77,6 +77,12 @@ public class NotionServiceImpl implements NotionService {
             columns.add(objectMapper.treeToValue(next, Column.class));
         }
 
+        //title являющийся первым столбцом в json'е находится в конце, ставим его вперед
+        //TODO подумать как решить более изящно
+        Column titleColumn = columns.get(columns.size() - 1);
+        columns.remove(titleColumn);
+        columns.add(0, titleColumn);
+
         return columns;
     }
 
