@@ -35,7 +35,7 @@ class NotionServiceImplTest {
     @DisplayName("Проверка получения списка колонок")
     void getPropertiesTest() throws Exception {
         String json = readFileAsString("database.json");
-        String expected = "[Property{id='title', name='Что ты делал сегодня?', type='title', select=null, createdTime=null, title=[Title{text=null}], richTexts=null}, Property{id='%3Dexl', name='Время', type='created_time', select=null, createdTime={}, title=null, richTexts=null}, Property{id='MqVL', name='Зарядка', type='select', select={\"options\":[{\"id\":\"vmcV\",\"name\":\"да\",\"color\":\"green\"},{\"id\":\"7722fde0-4959-4335-a76f-2ab95f7eb1fe\",\"name\":\"нет\",\"color\":\"red\"}]}, createdTime=null, title=null, richTexts=null}, Property{id='eF%3AK', name='Сон', type='rich_text', select=null, createdTime=null, title=null, richTexts=[RichText{text=null}]}]";
+        String expected = "[Property{id='title', name='Что ты делал сегодня?', type='title', select=null, createdTime=null, title=[Title{text=null}], richTexts=null}, Property{id='%3Dexl', name='Время', type='created_time', select=null, createdTime={}, title=null, richTexts=null}, Property{id='MqVL', name='Зарядка', type='select', select=Select{selectOptions=[SelectOptions{name='да'}, SelectOptions{name='нет'}]}, createdTime=null, title=null, richTexts=null}, Property{id='eF%3AK', name='Сон', type='rich_text', select=null, createdTime=null, title=null, richTexts=[RichText{text=null}]}]";
 
         ResponseEntity<String> response = new ResponseEntity<>(json, HttpStatus.ACCEPTED);
 

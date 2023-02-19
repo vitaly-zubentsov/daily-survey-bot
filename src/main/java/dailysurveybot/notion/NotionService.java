@@ -12,6 +12,8 @@ import java.util.List;
 public interface NotionService {
 
     /**
+     * Отпарвка заполненой строки в notion
+     *
      * @param columnsForFill - имена колонок заполняемой таблицы
      * @param valuesForFill  - значение введенные пользователем для имен колонок таблицы
      */

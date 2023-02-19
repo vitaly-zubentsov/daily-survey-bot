@@ -27,6 +27,7 @@ public class NotionServiceImpl implements NotionService {
 
     private final Logger logger = LoggerFactory.getLogger(NotionServiceImpl.class);
 
+    private final ObjectMapper objectMapper;
     private final NotionConfig notionConfig;
     private final RestTemplate restTemplate;
 
@@ -35,6 +36,7 @@ public class NotionServiceImpl implements NotionService {
                              RestTemplate restTemplate) {
         this.notionConfig = notionConfig;
         this.restTemplate = restTemplate;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -82,7 +84,6 @@ public class NotionServiceImpl implements NotionService {
                 String.class);
 
         //Получаем из ответа данные о свойствах колонок таблицы
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(response.getBody()).get("properties");
         List<Property> properties = new ArrayList<>();
         for (JsonNode next : jsonNode) {

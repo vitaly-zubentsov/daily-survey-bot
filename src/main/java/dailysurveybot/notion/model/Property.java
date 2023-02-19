@@ -17,8 +17,7 @@ public class Property {
     private String id;
     private String name;
     private String type;
-    @JsonProperty("select")
-    private JsonNode select;
+    private Select select;
     @JsonProperty("created_time")
     private JsonNode createdTime;
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -51,11 +50,11 @@ public class Property {
         this.type = type;
     }
 
-    public JsonNode getSelect() {
+    public Select getSelect() {
         return select;
     }
 
-    public void setSelect(JsonNode select) {
+    public void setSelect(Select select) {
         this.select = select;
     }
 
