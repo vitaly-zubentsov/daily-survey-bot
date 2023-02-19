@@ -1,7 +1,7 @@
 package dailysurveybot.notion;
 
 import dailysurveybot.config.NotionConfig;
-import dailysurveybot.notion.model.Column;
+import dailysurveybot.notion.model.Property;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +33,9 @@ class NotionServiceImplTest {
 
     @Test
     @DisplayName("Проверка получения списка колонок")
-    void getColumnsTest() throws Exception {
+    void getPropertiesTest() throws Exception {
         String json = readFileAsString("database.json");
-        String expected = "[Column{id='title', name='Что ты делал сегодня?', type='title', select=null, createdTime=null, title={}, richText=null}, Column{id='%3Dexl', name='Время', type='created_time', select=null, createdTime={}, title=null, richText=null}, Column{id='MqVL', name='Зарядка', type='select', select={\"options\":[{\"id\":\"vmcV\",\"name\":\"да\",\"color\":\"green\"},{\"id\":\"7722fde0-4959-4335-a76f-2ab95f7eb1fe\",\"name\":\"нет\",\"color\":\"red\"}]}, createdTime=null, title=null, richText=null}, Column{id='eF%3AK', name='Сон', type='rich_text', select=null, createdTime=null, title=null, richText={}}]";
+        String expected = "[Property{id='title', name='Что ты делал сегодня?', type='title', select=null, createdTime=null, title=[Title{text=null}], richTexts=null}, Property{id='%3Dexl', name='Время', type='created_time', select=null, createdTime={}, title=null, richTexts=null}, Property{id='MqVL', name='Зарядка', type='select', select={\"options\":[{\"id\":\"vmcV\",\"name\":\"да\",\"color\":\"green\"},{\"id\":\"7722fde0-4959-4335-a76f-2ab95f7eb1fe\",\"name\":\"нет\",\"color\":\"red\"}]}, createdTime=null, title=null, richTexts=null}, Property{id='eF%3AK', name='Сон', type='rich_text', select=null, createdTime=null, title=null, richTexts=[RichText{text=null}]}]";
 
         ResponseEntity<String> response = new ResponseEntity<>(json, HttpStatus.ACCEPTED);
 
@@ -46,9 +46,9 @@ class NotionServiceImplTest {
         when(notionConfig.apiToken()).thenReturn("token");
         when(notionConfig.apiVersion()).thenReturn("version");
 
-        List<Column> columnList = notionService.getColumns();
+        List<Property> propertyList = notionService.getProperties();
 
-        assertEquals(expected, columnList.toString());
+        assertEquals(expected, propertyList.toString());
     }
 
 }

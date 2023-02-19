@@ -1,7 +1,8 @@
 package dailysurveybot.notion;
 
-import dailysurveybot.notion.model.Column;
+import dailysurveybot.notion.model.Property;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
 
@@ -10,12 +11,17 @@ import java.util.List;
  */
 public interface NotionService {
 
-    void saveRow(String text) throws IOException, InterruptedException;
+    /**
+     * @param columnsForFill - имена колонок заполняемой таблицы
+     * @param valuesForFill  - значение введенные пользователем для имен колонок таблицы
+     */
+    void saveRow(@Nonnull List<String> columnsForFill, @Nonnull List<String> valuesForFill);
 
     /**
      * Получение списка колонок из таблицы в notion
      *
      * @return cписок колонок таблицы
      */
-    List<Column> getColumns() throws IOException, InterruptedException;
+    List<Property> getProperties() throws IOException, InterruptedException;
+
 }

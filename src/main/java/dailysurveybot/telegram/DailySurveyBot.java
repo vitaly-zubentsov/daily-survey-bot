@@ -42,11 +42,12 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
                           StartCommand startCommand,
                           SettingsCommand settingsCommand,
                           HelpCommand helpCommand,
+                          NonCommand nonCommand,
                           AddRowToTableCommand addRowToTableCommand) {
         super();
         this.botName = telegramConfig.botName();
         this.botToken = telegramConfig.botToken();
-        this.nonCommand = new NonCommand();
+        this.nonCommand = nonCommand;
 
         //регистрируем команды
         register(startCommand);

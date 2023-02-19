@@ -1,5 +1,6 @@
 package dailysurveybot.telegram.noncommands;
 
+import dailysurveybot.notion.NotionService;
 import dailysurveybot.telegram.DailySurveyBot;
 import dailysurveybot.telegram.entity.UserData;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class NonCommand {
+
+    private final NotionService notionService;
+
+    public NonCommand(NotionService notionService) {
+        this.notionService = notionService;
+    }
+
 
     public String execute(Long chatId, String userName, String text) {
         String answerToUser;
@@ -25,7 +33,7 @@ public class NonCommand {
                 // самом классе если нет то надо просто взятть обертку
                 int filledColumnsCounter = userData.getFilledColumnsCounter();
                 if (filledColumnsCounter > userData.getColumnsForFill().size()) {
-                    //todo send data to notion
+                    notionService.saveRow(userData.getColumnsForFill(), userData.getValuesForFill());
                     answerToUser = "таблица заполнена";
                     userData.getColumnsForFill().clear();
                     userData.setFilledColumnsCounter(1);

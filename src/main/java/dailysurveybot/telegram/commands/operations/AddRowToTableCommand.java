@@ -2,7 +2,7 @@ package dailysurveybot.telegram.commands.operations;
 
 import dailysurveybot.Utils;
 import dailysurveybot.notion.NotionService;
-import dailysurveybot.notion.model.Column;
+import dailysurveybot.notion.model.Property;
 import dailysurveybot.telegram.DailySurveyBot;
 import dailysurveybot.telegram.entity.UserData;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class AddRowToTableCommand extends OperationCommand {
         String answerToUser;
 
         try {
-            List<Column> columns = notionService.getColumns();
+            List<Property> properties = notionService.getProperties();
             UserData userData = DailySurveyBot.getUserData(chat.getId());
             List<String> columnsForFill = userData.getColumnsForFill();
             //очищаем раннее введенную пользователем информацию
@@ -38,8 +38,8 @@ public class AddRowToTableCommand extends OperationCommand {
             userData.getValuesForFill().clear();
             userData.setFilledColumnsCounter(1);
             //Заполняем данные из запроса
-            for (Column column : columns) {
-                columnsForFill.add(column.getName());
+            for (Property property : properties) {
+                columnsForFill.add(property.getName());
             }
             //Отправляем пользователю имя первого столбца для заполнениия
             answerToUser = columnsForFill.get(0);

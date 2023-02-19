@@ -1,13 +1,18 @@
 package dailysurveybot.notion.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Objects;
 
+import java.util.List;
+
 /**
- * Класс содержащий описание колонки таблицы
+ * Данные о колонке таблицы
  */
-public class Column {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Property {
 
     private String id;
     private String name;
@@ -16,9 +21,11 @@ public class Column {
     private JsonNode select;
     @JsonProperty("created_time")
     private JsonNode createdTime;
-    private Object title;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private List<Title> title;
     @JsonProperty("rich_text")
-    private Object richText;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private List<RichText> richTexts;
 
     public String getId() {
         return id;
@@ -60,51 +67,57 @@ public class Column {
         this.createdTime = createdTime;
     }
 
-    public Object getTitle() {
+    public List<Title> getTitle() {
         return title;
     }
 
-    public void setTitle(Object title) {
+    public void setTitle(List<Title> title) {
         this.title = title;
     }
 
-    public Object getRichText() {
-        return richText;
+    public List<RichText> getRichTexts() {
+        return richTexts;
     }
 
-    public void setRichText(Object richText) {
-        this.richText = richText;
+    public void setRichTexts(List<RichText> richTexts) {
+        this.richTexts = richTexts;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Column column = (Column) o;
-        return Objects.equal(id, column.id)
-                && Objects.equal(name, column.name)
-                && Objects.equal(type, column.type)
-                && Objects.equal(select, column.select)
-                && Objects.equal(createdTime, column.createdTime)
-                && Objects.equal(title, column.title)
-                && Objects.equal(richText, column.richText);
+        Property property = (Property) o;
+        return Objects.equal(id, property.id)
+                && Objects.equal(name, property.name)
+                && Objects.equal(type, property.type)
+                && Objects.equal(select, property.select)
+                && Objects.equal(createdTime, property.createdTime)
+                && Objects.equal(title, property.title)
+                && Objects.equal(richTexts, property.richTexts);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, name, type, select, createdTime, title, richText);
+        return Objects.hashCode(id,
+                name,
+                type,
+                select,
+                createdTime,
+                title,
+                richTexts);
     }
 
     @Override
     public String toString() {
-        return "Column{" +
+        return "Property{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", select=" + select +
                 ", createdTime=" + createdTime +
                 ", title=" + title +
-                ", richText=" + richText +
+                ", richTexts=" + richTexts +
                 '}';
     }
 }

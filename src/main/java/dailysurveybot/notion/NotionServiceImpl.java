@@ -4,28 +4,24 @@ package dailysurveybot.notion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dailysurveybot.config.NotionConfig;
-import dailysurveybot.notion.model.Column;
+import dailysurveybot.notion.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
-import static java.lang.String.format;
 
 @Service
 public class NotionServiceImpl implements NotionService {
 
-    private static final String BODY_TEMPLATE = "{\"parent\": { \"database_id\": \"%s\" },\"properties\": {\"title\": {\"title\": [{\"text\": {\"content\": \"%s\"}}]}}}";
     private static final String PAGES_URL = "pages";
     private static final String DATABASES_URL = "databases/";
 
@@ -42,23 +38,39 @@ public class NotionServiceImpl implements NotionService {
     }
 
     @Override
-    public void saveRow(String text) throws IOException, InterruptedException {
-        logger.info("Вызов saveRow");
+    public void saveRow(@Nonnull List<String> columnsForFill, @Nonnull List<String> valuesForFill) {
+        logger.debug("Вызов saveRow");
+        //заполняем строку
+        if (columnsForFill.size() != valuesForFill.size()) {
+            logger.warn("Ошибка при заполнении, columnsForFill :{}, valuesForFill : {}", columnsForFill, valuesForFill);
+            throw new RuntimeException("Что то пошло не так"); //TODO сделать отдельный класс ошибок
+        }
+        Page page = new Page();
+        page.setParent(new Parent());
+        page.getParent().setDatabaseId(notionConfig.databaseId());
+        HashMap<String, Property> stringColumnHashMap = new HashMap<>();
+        //заполняем title
+        Property titleProperty = getTitleProperty(valuesForFill.get(0));
+        stringColumnHashMap.put(columnsForFill.get(0), titleProperty);
+        //заполняем текстовые поля
+        for (int i = 1; i < columnsForFill.size(); i++) {
+            Property property = getPropertyWithRichText(valuesForFill, i);
+            stringColumnHashMap.put(columnsForFill.get(i), property);
+        }
+        PageProperties pageProperties = new PageProperties();
+        pageProperties.setProperties(stringColumnHashMap);
+        page.setPageProperties(pageProperties);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(notionConfig + PAGES_URL))
-                .header("Authorization", "Bearer " + notionConfig.apiToken())
-                .header("accept", "application/json")
-                .header("Notion-Version", notionConfig.apiVersion())
-                .header("content-type", "application/json")
-                .method("POST", HttpRequest.BodyPublishers.ofString(format(BODY_TEMPLATE, notionConfig.databaseId(), text)))
-                .build();
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        restTemplate.exchange(notionConfig.apiUrl() + PAGES_URL,
+                HttpMethod.POST,
+                new HttpEntity<>(page, getDefaultHeaders()),
+                Page.class);
+
         logger.info("Завершение вызова saveRow");
     }
 
     @Override
-    public List<Column> getColumns() throws IOException {
+    public List<Property> getProperties() throws IOException {
         String url = notionConfig.apiUrl() + DATABASES_URL + notionConfig.databaseId();
         logger.info("Вызов метода getColumns: {}", url);
 
@@ -72,18 +84,17 @@ public class NotionServiceImpl implements NotionService {
         //Получаем из ответа данные о свойствах колонок таблицы
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(response.getBody()).get("properties");
-        List<Column> columns = new ArrayList<>();
+        List<Property> properties = new ArrayList<>();
         for (JsonNode next : jsonNode) {
-            columns.add(objectMapper.treeToValue(next, Column.class));
+            properties.add(objectMapper.treeToValue(next, Property.class));
         }
 
-        //title являющийся первым столбцом в json'е находится в конце, ставим его вперед
-        //TODO подумать как решить более изящно
-        Column titleColumn = columns.get(columns.size() - 1);
-        columns.remove(titleColumn);
-        columns.add(0, titleColumn);
+        //title являющийся первым столбцом в таблице в json'е находится в конце, ставим его вперед
+        Property titleProperty = properties.get(properties.size() - 1);
+        properties.remove(titleProperty);
+        properties.add(0, titleProperty);
 
-        return columns;
+        return properties;
     }
 
     private HttpHeaders getDefaultHeaders() {
@@ -93,6 +104,30 @@ public class NotionServiceImpl implements NotionService {
         headers.set("Authorization", "Bearer " + notionConfig.apiToken());
         headers.set("Notion-Version", notionConfig.apiVersion());
         return headers;
+    }
+
+    private Property getPropertyWithRichText(List<String> valuesForFill, int i) {
+        Property property = new Property();
+        List<RichText> richTexts = new ArrayList<>();
+        RichText richText = new RichText();
+        Text text = new Text();
+        text.setContent(valuesForFill.get(i));
+        richText.setText(text);
+        richTexts.add(richText);
+        property.setRichTexts(richTexts);
+        return property;
+    }
+
+    private Property getTitleProperty(String text) {
+        Property titleProperty = new Property();
+        Title titleOne = new Title();
+        Text textTitle = new Text();
+        textTitle.setContent(text);
+        titleOne.setText(textTitle);
+        List<Title> title = new ArrayList<>();
+        title.add(titleOne);
+        titleProperty.setTitle(title);
+        return titleProperty;
     }
 
 }
