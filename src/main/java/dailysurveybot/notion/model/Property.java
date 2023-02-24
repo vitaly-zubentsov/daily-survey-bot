@@ -9,7 +9,7 @@ import com.google.common.base.Objects;
 import java.util.List;
 
 /**
- * Данные о колонке таблицы
+ * Данные о колонке таблицы, в терминологии notion Property
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Property {

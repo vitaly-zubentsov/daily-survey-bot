@@ -1,20 +1,17 @@
 package dailysurveybot.notion.model;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Objects;
 
 import java.util.Map;
 
 /**
- * Свойства строки, содержит данные о колонках таблицы
+ * Таблица со столбцамии, в терминологии notion Database
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class PageProperties {
+@JsonIgnoreProperties(value = {"description", "object", "id", "cover", "icon", "icon", "last_edited_by", "created_by", "last_edited_time", "created_time", "title", "is_inline", "parent", "url", "archived"})
+public class Database {
 
-    /**
-     * Свойства столбцов таблицы, ключ - имя строки
-     */
     private Map<String, Property> properties;
 
     @JsonAnyGetter
@@ -30,8 +27,8 @@ public class PageProperties {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PageProperties that = (PageProperties) o;
-        return Objects.equal(properties, that.properties);
+        Database database = (Database) o;
+        return Objects.equal(properties, database.properties);
     }
 
     @Override
@@ -41,7 +38,7 @@ public class PageProperties {
 
     @Override
     public String toString() {
-        return "PageProperties{" +
+        return "Database{" +
                 "properties=" + properties +
                 '}';
     }

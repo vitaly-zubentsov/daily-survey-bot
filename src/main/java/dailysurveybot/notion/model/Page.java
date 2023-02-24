@@ -1,11 +1,13 @@
 package dailysurveybot.notion.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 
 /**
  * Строка таблицы, в терминологии notion - page
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Page {
 
     private Parent parent;

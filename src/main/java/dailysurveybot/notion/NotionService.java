@@ -1,9 +1,8 @@
 package dailysurveybot.notion;
 
-import dailysurveybot.notion.model.Property;
+import dailysurveybot.notion.model.api.ColumnInfo;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -14,16 +13,15 @@ public interface NotionService {
     /**
      * Отпарвка заполненой строки в notion
      *
-     * @param columnsForFill - имена колонок заполняемой таблицы
-     * @param valuesForFill  - значение введенные пользователем для имен колонок таблицы
+     * @param properties - заполненные колонки таблицы
      */
-    void saveRow(@Nonnull List<String> columnsForFill, @Nonnull List<String> valuesForFill);
+    void saveRow(@Nonnull List<ColumnInfo> properties);
 
     /**
-     * Получение списка колонок из таблицы в notion
+     * Получение списка данных о колонках в таблице notion
      *
      * @return cписок колонок таблицы
      */
-    List<Property> getProperties() throws IOException, InterruptedException;
+    List<ColumnInfo> getColumnsInfo();
 
 }

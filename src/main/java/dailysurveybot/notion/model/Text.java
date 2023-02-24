@@ -15,6 +15,13 @@ public class Text {
         return content;
     }
 
+    public Text() {
+    }
+
+    public Text(String content) {
+        this.content = content;
+    }
+
     public void setContent(String content) {
         this.content = content;
     }

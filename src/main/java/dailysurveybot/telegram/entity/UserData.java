@@ -1,6 +1,7 @@
 package dailysurveybot.telegram.entity;
 
 import com.google.common.base.Objects;
+import dailysurveybot.notion.model.api.ColumnInfo;
 
 import java.util.List;
 
@@ -10,32 +11,21 @@ import java.util.List;
 public class UserData {
 
     //Имена колонок в заполняемой таблице
-    private List<String> columnsForFill;
-    //Значения введённые пользователем для заполнения таблицы
-    private List<String> valuesForFill;
+    private List<ColumnInfo> columnInfoList;
     //Счетчик заполненых полей заполняемой таблицы
     private int filledColumnsCounter;
 
-    public UserData(List<String> columnsForFill, List<String> valuesForFill, int filledColumnsCounter) {
-        this.columnsForFill = columnsForFill;
-        this.valuesForFill = valuesForFill;
+    public UserData(List<ColumnInfo> columnInfoList, int filledColumnsCounter) {
+        this.columnInfoList = columnInfoList;
         this.filledColumnsCounter = filledColumnsCounter;
     }
 
-    public List<String> getColumnsForFill() {
-        return columnsForFill;
+    public List<ColumnInfo> getColumnInfoList() {
+        return columnInfoList;
     }
 
-    public void setColumnsForFill(List<String> columnsForFill) {
-        this.columnsForFill = columnsForFill;
-    }
-
-    public List<String> getValuesForFill() {
-        return valuesForFill;
-    }
-
-    public void setValuesForFill(List<String> valuesForFill) {
-        this.valuesForFill = valuesForFill;
+    public void setColumnInfoList(List<ColumnInfo> columnInfoList) {
+        this.columnInfoList = columnInfoList;
     }
 
     public int getFilledColumnsCounter() {
@@ -52,20 +42,18 @@ public class UserData {
         if (o == null || getClass() != o.getClass()) return false;
         UserData userData = (UserData) o;
         return filledColumnsCounter == userData.filledColumnsCounter
-                && Objects.equal(columnsForFill, userData.columnsForFill)
-                && Objects.equal(valuesForFill, userData.valuesForFill);
+                && Objects.equal(columnInfoList, userData.columnInfoList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(columnsForFill, valuesForFill, filledColumnsCounter);
+        return Objects.hashCode(columnInfoList, filledColumnsCounter);
     }
 
     @Override
     public String toString() {
         return "UserData{" +
-                "columnsForFill=" + columnsForFill +
-                ", valuesForFill=" + valuesForFill +
+                "columnInfoList=" + columnInfoList +
                 ", filledColumnsCounter=" + filledColumnsCounter +
                 '}';
     }

@@ -29,7 +29,7 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static final UserData DEFAULT_USER_DATA = new UserData(new ArrayList<>(), new ArrayList<>(), 0);
+    private static final UserData DEFAULT_USER_DATA = new UserData(new ArrayList<>(), 0);
 
     // Данные пользователей. Ключ - уникальный id чата
     private static final Map<Long, UserData> usersData = new HashMap<>();

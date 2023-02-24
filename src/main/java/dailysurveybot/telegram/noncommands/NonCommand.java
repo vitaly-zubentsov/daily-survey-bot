@@ -1,10 +1,13 @@
 package dailysurveybot.telegram.noncommands;
 
 import dailysurveybot.notion.NotionService;
+import dailysurveybot.notion.model.api.ColumnInfo;
 import dailysurveybot.telegram.DailySurveyBot;
 import dailysurveybot.telegram.entity.UserData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
+import static dailysurveybot.notion.model.enums.PropertyType.SELECT;
 
 /**
  * Обработка сообщения, не являющегося командой (т.е. обычного текста не начинающегося с "/")
@@ -24,22 +27,26 @@ public class NonCommand {
         String answerToUser;
         try {
             UserData userData = DailySurveyBot.getUserData(chatId);
-            if (userData.getColumnsForFill().isEmpty()) {
+            if (userData.getColumnInfoList().isEmpty()) {
                 answerToUser = "Для обновления таблицы введите /t";
             } else {
-                addTextToValueForFill(text, userData);
+                addTextToColumn(text, userData);
+
                 userData.setFilledColumnsCounter(userData.getFilledColumnsCounter() + 1);
-                //TODO поэкспериментировать примитив в итоге локально обновленный будет ли изменияться в
-                // самом классе если нет то надо просто взятть обертку
                 int filledColumnsCounter = userData.getFilledColumnsCounter();
-                if (filledColumnsCounter > userData.getColumnsForFill().size()) {
-                    notionService.saveRow(userData.getColumnsForFill(), userData.getValuesForFill());
+
+                if (filledColumnsCounter == userData.getColumnInfoList().size()) {
+                    notionService.saveRow(userData.getColumnInfoList());
                     answerToUser = "таблица заполнена";
-                    userData.getColumnsForFill().clear();
-                    userData.setFilledColumnsCounter(1);
-                    userData.getValuesForFill().clear();
+                    userData.getColumnInfoList().clear();
+                    userData.setFilledColumnsCounter(0);
                 } else {
-                    answerToUser = userData.getColumnsForFill().get(filledColumnsCounter - 1);
+                    ColumnInfo columnInfo = userData.getColumnInfoList().get(filledColumnsCounter);
+                    answerToUser = columnInfo.getName();
+                    if (SELECT.getValue().equals(columnInfo.getType())) {
+                        //TODO сделать клавиатуру клавиатуру на селекты
+                        answerToUser += columnInfo.getSelectOptions();
+                    }
                 }
                 //TODO логируем событие, используя userName
             }
@@ -55,13 +62,12 @@ public class NonCommand {
         return answerToUser;
     }
 
-
-    private void addTextToValueForFill(String text, UserData userData) {
+    private void addTextToColumn(String text, UserData userData) {
         //отсекаем файлы, стикеры, гифки и прочий мусор
         if (StringUtils.isBlank(text)) {
             throw new IllegalArgumentException("Сообщение не является текстом");
         }
-        userData.getValuesForFill().add(text);
+        ColumnInfo columnInfo = userData.getColumnInfoList().get(userData.getFilledColumnsCounter());
+        columnInfo.setTextFromUser(text);
     }
-
 }

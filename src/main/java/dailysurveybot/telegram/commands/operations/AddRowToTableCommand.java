@@ -2,7 +2,7 @@ package dailysurveybot.telegram.commands.operations;
 
 import dailysurveybot.Utils;
 import dailysurveybot.notion.NotionService;
-import dailysurveybot.notion.model.Property;
+import dailysurveybot.notion.model.api.ColumnInfo;
 import dailysurveybot.telegram.DailySurveyBot;
 import dailysurveybot.telegram.entity.UserData;
 import org.springframework.stereotype.Component;
@@ -10,8 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.List;
-
+import static dailysurveybot.notion.model.enums.PropertyType.SELECT;
 import static dailysurveybot.telegram.constants.CommandsEnum.ADD_ROW_TO_TABLE;
 
 @Component
@@ -30,22 +29,20 @@ public class AddRowToTableCommand extends OperationCommand {
         String answerToUser;
 
         try {
-            List<Property> properties = notionService.getProperties();
             UserData userData = DailySurveyBot.getUserData(chat.getId());
-            List<String> columnsForFill = userData.getColumnsForFill();
-            //очищаем раннее введенную пользователем информацию
-            columnsForFill.clear();
-            userData.getValuesForFill().clear();
-            userData.setFilledColumnsCounter(1);
-            //Заполняем данные из запроса
-            for (Property property : properties) {
-                columnsForFill.add(property.getName());
+            userData.setColumnInfoList(notionService.getColumnsInfo());
+            userData.setFilledColumnsCounter(0);
+            //Отправляем пользователю имя первого столбца для заполнениия.
+            // Последующие столбыцы обрабатываются после ввода пользователем текста (не команд) в ответ боту
+            ColumnInfo columnInfo = userData.getColumnInfoList().get(0);
+            answerToUser = columnInfo.getName();
+            if (SELECT.getValue().equals(columnInfo.getType())) {
+                //TODO сделать клавиатуру клавиатуру на селекты
+                answerToUser += columnInfo.getSelectOptions();
             }
-            //Отправляем пользователю имя первого столбца для заполнениия
-            answerToUser = columnsForFill.get(0);
         } catch (Exception e) { //TODO  добавить классы ошибок
             answerToUser = "Что то пошло не так. Я не могу получить имена столбоцов таблицы";
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, answerToUser);
