@@ -1,7 +1,7 @@
-package dailysurveybot.telegram.commands.services;
+package dailysurveybot.telegram.commands;
 
 
-import dailysurveybot.Utils;
+import dailysurveybot.telegram.Utils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import static dailysurveybot.telegram.constants.CommandsEnum.START;
 
 @Component
-public class StartCommand extends ServiceCommand {
+public class StartCommand extends AbstractCommand {
 
     public StartCommand() {
         super(START.getIdentifier(), START.getDescription());

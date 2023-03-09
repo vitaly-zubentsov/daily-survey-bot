@@ -59,17 +59,17 @@ public class ColumnInfoConverter {
         property.setRichTexts(richTexts);
     }
 
-    private void setTextToTitle(Property titleProperty, String text) {
+    private void setTextToTitle(Property property, String text) {
         Title title = new Title();
         title.setText(new Text(text));
         List<Title> titles = new ArrayList<>();
         titles.add(title);
-        titleProperty.setTitle(titles);
+        property.setTitle(titles);
     }
 
-    private void setTextToSelect(Property titleProperty, String text) {
+    private void setTextToSelect(Property property, String text) {
         Select select = new Select();
         select.setName(text);
-        titleProperty.setSelect(select);
+        property.setSelect(select);
     }
 }

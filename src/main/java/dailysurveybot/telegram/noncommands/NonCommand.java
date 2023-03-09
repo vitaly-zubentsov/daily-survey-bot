@@ -5,6 +5,8 @@ import dailysurveybot.notion.model.api.ColumnInfo;
 import dailysurveybot.telegram.DailySurveyBot;
 import dailysurveybot.telegram.entity.UserData;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import static dailysurveybot.notion.model.enums.PropertyType.SELECT;
@@ -16,6 +18,8 @@ import static dailysurveybot.notion.model.enums.PropertyType.SELECT;
 @Component
 public class NonCommand {
 
+    protected final Logger logger = LoggerFactory.getLogger(NonCommand.class);
+
     private final NotionService notionService;
 
     public NonCommand(NotionService notionService) {
@@ -24,42 +28,44 @@ public class NonCommand {
 
 
     public String execute(Long chatId, String userName, String text) {
-        String answerToUser;
+        logger.debug("Пользователь {}. Запуск обработки сообщения \"{}\", не являющегося командой",
+                userName, text);
+        String answer;
+        UserData userData = null;
         try {
-            UserData userData = DailySurveyBot.getUserData(chatId);
+            userData = DailySurveyBot.getUserData(chatId);
+            logger.debug("Пользователь {}. При обработке сообщения пользователем получены следующие данные {}", userName, userData);
             if (userData.getColumnInfoList().isEmpty()) {
-                answerToUser = "Для обновления таблицы введите /t";
+                answer = "Для обновления таблицы введите /t";
             } else {
                 addTextToColumn(text, userData);
-
                 userData.setFilledColumnsCounter(userData.getFilledColumnsCounter() + 1);
                 int filledColumnsCounter = userData.getFilledColumnsCounter();
 
                 if (filledColumnsCounter == userData.getColumnInfoList().size()) {
                     notionService.saveRow(userData.getColumnInfoList());
-                    answerToUser = "таблица заполнена";
+                    answer = "Таблица заполнена";
                     userData.getColumnInfoList().clear();
                     userData.setFilledColumnsCounter(0);
                 } else {
                     ColumnInfo columnInfo = userData.getColumnInfoList().get(filledColumnsCounter);
-                    answerToUser = columnInfo.getName();
+                    answer = columnInfo.getName();
                     if (SELECT.getValue().equals(columnInfo.getType())) {
                         //TODO сделать клавиатуру клавиатуру на селекты
-                        answerToUser += columnInfo.getSelectOptions();
+                        answer += columnInfo.getSelectOptions();
                     }
                 }
-                //TODO логируем событие, используя userName
             }
+        } catch (IllegalArgumentException e) {
+            logger.error("Пользователь {}. Не удалось обработать сообщение пользователя {} , данные пользователя {}, ошибка {}", userName, text, userData, e.getMessage());
+            answer = "Сообщение не является текстом. Я могу сохранять только текстовые сообщения";
         } catch (RuntimeException e) {
-            //TODO сделать exception именно для ошибки установки обработчик
-            answerToUser = e.getMessage() +
-                    "\n\n Настройки не были изменены. Вы всегда можете их посмотреть с помощью /settings";
-            //TODO логируем событие, используя userName
-        } catch (Exception e) {
-            answerToUser = "Простите, я не понимаю Вас. Возможно, Вам поможет /help";
-            //TODO логируем событие, используя userName
+            logger.error("Пользователь {}. Не удалось обработать сообщение пользователя {} , данные пользователя {}, ошибка {}", userName, text, userData, e.getMessage());
+            answer = "Простите, я не понимаю Вас. Возможно, Вам поможет /help";
         }
-        return answerToUser;
+        logger.debug("Пользователь {}. Завершена обработка сообщения \"{}\", не являющегося командой",
+                userName, text);
+        return answer;
     }
 
     private void addTextToColumn(String text, UserData userData) {

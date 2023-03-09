@@ -56,7 +56,7 @@ public class NotionServiceImpl implements NotionService {
     @Override
     public List<ColumnInfo> getColumnsInfo() {
         String url = notionConfig.apiUrl() + DATABASES_URL + notionConfig.databaseId();
-        logger.debug("Вызов метода getColumnsInfo: {}", url);
+        logger.debug("Вызов метода getColumnsInfo. url {}", url);
 
         //Запрос на получение данных о таблице в notion
         ResponseEntity<Database> response = restTemplate.exchange(

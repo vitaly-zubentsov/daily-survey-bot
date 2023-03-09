@@ -1,10 +1,10 @@
 package dailysurveybot.telegram;
 
 import dailysurveybot.config.TelegramConfig;
-import dailysurveybot.telegram.commands.operations.AddRowToTableCommand;
-import dailysurveybot.telegram.commands.services.HelpCommand;
-import dailysurveybot.telegram.commands.services.SettingsCommand;
-import dailysurveybot.telegram.commands.services.StartCommand;
+import dailysurveybot.telegram.commands.AddRowToTableCommand;
+import dailysurveybot.telegram.commands.HelpCommand;
+import dailysurveybot.telegram.commands.SettingsCommand;
+import dailysurveybot.telegram.commands.StartCommand;
 import dailysurveybot.telegram.entity.UserData;
 import dailysurveybot.telegram.noncommands.NonCommand;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingC
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -28,8 +27,6 @@ import java.util.Map;
 public class DailySurveyBot extends TelegramLongPollingCommandBot {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private static final UserData DEFAULT_USER_DATA = new UserData(new ArrayList<>(), 0);
 
     // Данные пользователей. Ключ - уникальный id чата
     private static final Map<Long, UserData> usersData = new HashMap<>();
@@ -58,7 +55,6 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
         logger.debug("Команда help была зарегистрирована");
         register(addRowToTableCommand);
         logger.debug("Команда AddRowToTableCommand(/t) была зарегистрирована");
-
         logger.debug("Бот был создан");
     }
 
@@ -83,7 +79,7 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
     public void processNonCommandUpdate(Update update) {
         final Message msg = update.getMessage();
         final Long chatId = msg.getChatId();
-        final String userName = getUserName(msg);
+        final String userName = Utils.getUserName(msg.getFrom());
 
         final String answer = nonCommand.execute(chatId, userName, msg.getText());
         setAnswer(chatId, userName, answer);
@@ -93,23 +89,14 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
      * Получение настроек по id чата. Если ранее для этого чата в ходе сеанса работы бота настройки не были установлены, используются настройки по умолчанию
      */
     public static UserData getUserData(Long chatId) {
-        Map<Long, UserData> usersData = DailySurveyBot.getUsersData();
-        UserData userData = usersData.get(chatId);
+        Map<Long, UserData> userDataMap = DailySurveyBot.getUsersData();
+        UserData userData = userDataMap.get(chatId);
         if (userData == null) {
-            return DEFAULT_USER_DATA;
+            UserData userDataDefault = new UserData(new ArrayList<>(), 0);
+            userDataMap.put(chatId, userDataDefault);
+            return userDataDefault;
         }
         return userData;
-    }
-
-    /**
-     * Формирование имени пользователя
-     *
-     * @param msg сообщение
-     */
-    private String getUserName(Message msg) {
-        User user = msg.getFrom();
-        String userName = user.getUserName();
-        return (userName != null) ? userName : String.format("%s %s", user.getLastName(), user.getFirstName());
     }
 
     /**
@@ -126,7 +113,7 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
         try {
             execute(answer);
         } catch (TelegramApiException e) {
-            //логируем сбой Telegram telegram.Bot API, используя userName
+            logger.error("Пользователь {}. Сбой при отправке сообщения в телеграмм. SendMessage {}", userName, answer);
         }
     }
 

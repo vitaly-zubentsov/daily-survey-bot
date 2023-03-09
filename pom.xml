@@ -13,7 +13,7 @@
 
     <groupId>com.vitalyzubentsov.dailysurveybot</groupId>
     <artifactId>daily-survey-bot</artifactId>
-    <version>0.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <name>daily-survey-bot</name>
     <description>Бот для внесения данных в таблицу notion</description>
     <packaging>jar</packaging>

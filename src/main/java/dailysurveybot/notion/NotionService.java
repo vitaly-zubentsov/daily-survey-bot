@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
- * Интерфейс для взаимодействия с notion
+ * Интерфейс взаимодействия с notion
  */
 public interface NotionService {
 

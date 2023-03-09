@@ -1,9 +1,9 @@
-package dailysurveybot.telegram.commands.operations;
+package dailysurveybot.telegram.commands;
 
-import dailysurveybot.Utils;
 import dailysurveybot.notion.NotionService;
 import dailysurveybot.notion.model.api.ColumnInfo;
 import dailysurveybot.telegram.DailySurveyBot;
+import dailysurveybot.telegram.Utils;
 import dailysurveybot.telegram.entity.UserData;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -14,7 +14,7 @@ import static dailysurveybot.notion.model.enums.PropertyType.SELECT;
 import static dailysurveybot.telegram.constants.CommandsEnum.ADD_ROW_TO_TABLE;
 
 @Component
-public class AddRowToTableCommand extends OperationCommand {
+public class AddRowToTableCommand extends AbstractCommand {
 
     private final NotionService notionService;
 
@@ -40,9 +40,10 @@ public class AddRowToTableCommand extends OperationCommand {
                 //TODO сделать клавиатуру клавиатуру на селекты
                 answerToUser += columnInfo.getSelectOptions();
             }
-        } catch (Exception e) { //TODO  добавить классы ошибок
+        } catch (RuntimeException e) {
             answerToUser = "Что то пошло не так. Я не могу получить имена столбоцов таблицы";
-            logger.debug(e.getMessage());
+            logger.error("Пользователь {}, ошибка {}", userName, e.getMessage());
+            e.printStackTrace();
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, answerToUser);
