@@ -2,24 +2,20 @@ package dailysurveybot.telegram;
 
 import dailysurveybot.config.TelegramConfig;
 import dailysurveybot.notion.model.api.ColumnInfo;
-import dailysurveybot.telegram.commands.AddRowToTableCommand;
-import dailysurveybot.telegram.commands.HelpCommand;
-import dailysurveybot.telegram.commands.SettingsCommand;
-import dailysurveybot.telegram.commands.StartCommand;
+import dailysurveybot.telegram.commands.info.HelpCommand;
+import dailysurveybot.telegram.commands.info.SettingsCommand;
+import dailysurveybot.telegram.commands.info.StartCommand;
+import dailysurveybot.telegram.commands.operation.AddRowToTableCommand;
 import dailysurveybot.telegram.entity.UserData;
 import dailysurveybot.telegram.noncommands.NonCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,9 +23,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DailySurveyBotTest {
-
-    @InjectMocks
-    DailySurveyBot dailySurveyBot;
 
     @Mock
     private TelegramConfig telegramConfig;
@@ -45,8 +38,8 @@ class DailySurveyBotTest {
     private AddRowToTableCommand addRowToTableCommand;
 
     @Test
-    @DisplayName("Отправка сообщения от пользователя")
-    void processNonCommandUpdate_setAnswer() throws TelegramApiException {
+    @DisplayName("Получение сообщения от пользователя")
+    void processNonCommandUpdate_UpdateIsMessage_sendAnswer() throws TelegramApiException {
         //given
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
@@ -66,7 +59,48 @@ class DailySurveyBotTest {
         Long chatId = 123L;
         update.getMessage().getChat().setId(chatId);
         String answerToUser = "Answer to user";
-        when(nonCommand.execute(chatId, userName, text)).thenReturn(answerToUser);
+        SendMessage answer = new SendMessage();
+        answer.setText(answerToUser);
+        answer.setChatId(chatId.toString());
+        when(nonCommand.execute(chatId, userName, text)).thenReturn(answer);
+
+        //when
+        dailySurveyBot.processNonCommandUpdate(update);
+
+        //then
+        verify(dailySurveyBot, times(1)).execute(messageArgumentCaptor.capture());
+        SendMessage sendMessage = messageArgumentCaptor.getValue();
+        assertEquals(answerToUser, sendMessage.getText());
+        assertEquals(chatId.toString(), sendMessage.getChatId());
+    }
+
+    @Test
+    @DisplayName("Получение CallbackQuery от пользователя")
+    void processNonCommandUpdate_UpdateIsCallbackQuery_sendAnswer() throws TelegramApiException {
+        //given
+        DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
+                startCommand,
+                settingsCommand,
+                helpCommand,
+                nonCommand,
+                addRowToTableCommand));
+        ArgumentCaptor<SendMessage> messageArgumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        Update update = new Update();
+        update.setCallbackQuery(new CallbackQuery());
+        String text = "text";
+        update.getCallbackQuery().setData(text);
+        update.getCallbackQuery().setFrom(new User());
+        String userName = "userName";
+        update.getCallbackQuery().getFrom().setUserName(userName);
+        Long chatId = 123L;
+        update.getCallbackQuery().setMessage(new Message());
+        update.getCallbackQuery().getMessage().setChat(new Chat());
+        update.getCallbackQuery().getMessage().getChat().setId(chatId);
+        String answerToUser = "Answer to user";
+        SendMessage answer = new SendMessage();
+        answer.setText(answerToUser);
+        answer.setChatId(chatId.toString());
+        when(nonCommand.execute(chatId, userName, text)).thenReturn(answer);
 
         //when
         dailySurveyBot.processNonCommandUpdate(update);
@@ -143,6 +177,5 @@ class DailySurveyBotTest {
         assertNotNull(userData.getColumnInfoList());
         assertTrue(userData.getColumnInfoList().isEmpty());
     }
-
 
 }

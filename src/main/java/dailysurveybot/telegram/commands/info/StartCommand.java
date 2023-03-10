@@ -1,4 +1,5 @@
-package dailysurveybot.telegram.commands;
+package dailysurveybot.telegram.commands.info;
+
 
 import dailysurveybot.telegram.Utils;
 import org.springframework.stereotype.Component;
@@ -6,19 +7,20 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import static dailysurveybot.telegram.constants.CommandsEnum.HELP;
+import static dailysurveybot.telegram.constants.CommandsEnum.START;
 
 @Component
-public class HelpCommand extends AbstractCommand {
+public class StartCommand extends InfoCommand {
 
-    public HelpCommand() {
-        super(HELP.getIdentifier(), HELP.getDescription());
+    public StartCommand() {
+        super(START.getIdentifier(), START.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         String userName = Utils.getUserName(user);
+
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
-                "Вызываешь /t и заполняешь таблицу, чего непонятного то?");
+                "Давайте начнём! Я заполняю таблицу в notion. Достаточно набрать команду /t. Если Вам нужна помощь, нажмите /help");
     }
 }

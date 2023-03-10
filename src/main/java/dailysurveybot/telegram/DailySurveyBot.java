@@ -1,10 +1,10 @@
 package dailysurveybot.telegram;
 
 import dailysurveybot.config.TelegramConfig;
-import dailysurveybot.telegram.commands.AddRowToTableCommand;
-import dailysurveybot.telegram.commands.HelpCommand;
-import dailysurveybot.telegram.commands.SettingsCommand;
-import dailysurveybot.telegram.commands.StartCommand;
+import dailysurveybot.telegram.commands.info.HelpCommand;
+import dailysurveybot.telegram.commands.info.SettingsCommand;
+import dailysurveybot.telegram.commands.info.StartCommand;
+import dailysurveybot.telegram.commands.operation.AddRowToTableCommand;
 import dailysurveybot.telegram.entity.UserData;
 import dailysurveybot.telegram.noncommands.NonCommand;
 import org.slf4j.Logger;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -77,12 +76,28 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
      */
     @Override
     public void processNonCommandUpdate(Update update) {
-        final Message msg = update.getMessage();
-        final Long chatId = msg.getChatId();
-        final String userName = Utils.getUserName(msg.getFrom());
+        Long chatId;
+        String userName;
+        String textFromUser;
+        if (update.hasCallbackQuery()) {
+            //Получение данных при нажатии inline клавиатуры пользователем
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+            userName = Utils.getUserName(update.getCallbackQuery().getFrom());
+            textFromUser = update.getCallbackQuery().getData();
+        } else {
+            //Получение данных из сообщения от пользователя
+            chatId = update.getMessage().getChatId();
+            userName = Utils.getUserName(update.getMessage().getFrom());
+            textFromUser = update.getMessage().getText();
+        }
 
-        final String answer = nonCommand.execute(chatId, userName, msg.getText());
-        setAnswer(chatId, userName, answer);
+        SendMessage answer = nonCommand.execute(chatId, userName, textFromUser);
+
+        try {
+            execute(answer);
+        } catch (TelegramApiException e) {
+            logger.error("Пользователь {}. Сбой при отправке сообщения в телеграмм. SendMessage {}", userName, answer);
+        }
     }
 
     /**
@@ -97,24 +112,6 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
             return userDataDefault;
         }
         return userData;
-    }
-
-    /**
-     * Отправка ответа
-     *
-     * @param chatId   id чата
-     * @param userName имя пользователя
-     * @param text     текст ответа
-     */
-    private void setAnswer(Long chatId, String userName, String text) {
-        SendMessage answer = new SendMessage();
-        answer.setText(text);
-        answer.setChatId(chatId.toString());
-        try {
-            execute(answer);
-        } catch (TelegramApiException e) {
-            logger.error("Пользователь {}. Сбой при отправке сообщения в телеграмм. SendMessage {}", userName, answer);
-        }
     }
 
 }

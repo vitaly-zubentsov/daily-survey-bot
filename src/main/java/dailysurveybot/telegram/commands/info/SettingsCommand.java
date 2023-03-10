@@ -1,4 +1,4 @@
-package dailysurveybot.telegram.commands;
+package dailysurveybot.telegram.commands.info;
 
 import dailysurveybot.telegram.Utils;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import static dailysurveybot.telegram.constants.CommandsEnum.SETTINGS;
 
 @Component
-public class SettingsCommand extends AbstractCommand {
+public class SettingsCommand extends InfoCommand {
 
     public SettingsCommand() {
         super(SETTINGS.getIdentifier(), SETTINGS.getDescription());
