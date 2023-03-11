@@ -24,13 +24,13 @@ class ColumnInfoConverterTest {
         Database database = new Database();
         database.setProperties(new HashMap<>());
         Property propertyRichText = new Property();
-        propertyRichText.setName("RichText");
+        propertyRichText.setName("22RichText");
         propertyRichText.setType(RICH_TEXT.getValue());
         Property propertyTitle = new Property();
-        propertyTitle.setName("Title");
+        propertyTitle.setName("1Title");
         propertyTitle.setType(TITLE.getValue());
         Property propertySelect = new Property();
-        propertySelect.setName("Select");
+        propertySelect.setName("333Select");
         propertySelect.setType(SELECT.getValue());
         Select select = new Select();
         SelectOptions selectOptions1 = new SelectOptions();
@@ -48,17 +48,17 @@ class ColumnInfoConverterTest {
 
         //then
         assertEquals(3, columnInfos.size());
-        assertEquals(propertyRichText.getName(), columnInfos.get(0).getName());
-        assertEquals(propertyRichText.getType(), columnInfos.get(0).getType());
+        assertEquals("Title", columnInfos.get(0).getName());
+        assertEquals(propertyTitle.getType(), columnInfos.get(0).getType());
         assertNull(columnInfos.get(0).getTextFromUser());
-        assertEquals(propertyTitle.getName(), columnInfos.get(2).getName());
-        assertEquals(propertyTitle.getType(), columnInfos.get(2).getType());
-        assertNull(columnInfos.get(2).getTextFromUser());
-        assertEquals(propertySelect.getName(), columnInfos.get(1).getName());
-        assertEquals(propertySelect.getType(), columnInfos.get(1).getType());
-        assertEquals(selectOptions1.getName(), columnInfos.get(1).getSelectOptions().get(0));
-        assertEquals(selectOptions2.getName(), columnInfos.get(1).getSelectOptions().get(1));
+        assertEquals("RichText", columnInfos.get(1).getName());
+        assertEquals(propertyRichText.getType(), columnInfos.get(1).getType());
         assertNull(columnInfos.get(1).getTextFromUser());
+        assertEquals("Select", columnInfos.get(2).getName());
+        assertEquals(propertySelect.getType(), columnInfos.get(2).getType());
+        assertEquals(selectOptions1.getName(), columnInfos.get(2).getSelectOptions().get(0));
+        assertEquals(selectOptions2.getName(), columnInfos.get(2).getSelectOptions().get(1));
+        assertNull(columnInfos.get(2).getTextFromUser());
     }
 
     @Test
@@ -73,19 +73,19 @@ class ColumnInfoConverterTest {
     void convertColumnsInfoListToPageProperties_ReturnPageProperties() {
         //given
         ColumnInfo columnInfo1 = new ColumnInfo();
-        columnInfo1.setName("RichText");
+        columnInfo1.setNameWithOrderPrefix("2RichText");
         columnInfo1.setType(RICH_TEXT.getValue());
         columnInfo1.setTextFromUser("first");
         ColumnInfo columnInfo2 = new ColumnInfo();
-        columnInfo2.setName("Title");
+        columnInfo2.setNameWithOrderPrefix("1Title");
         columnInfo2.setType(TITLE.getValue());
         columnInfo2.setTextFromUser("second");
         ColumnInfo columnInfo3 = new ColumnInfo();
-        columnInfo3.setName("Select");
+        columnInfo3.setNameWithOrderPrefix("3Select");
         columnInfo3.setType(SELECT.getValue());
         columnInfo3.setTextFromUser("third");
         ColumnInfo columnInfo4 = new ColumnInfo();
-        columnInfo4.setName("Time");
+        columnInfo4.setNameWithOrderPrefix("Time");
         columnInfo4.setType("created_time");
         columnInfo4.setTextFromUser("bla-bla");
         List<ColumnInfo> columnInfos = List.of(columnInfo1, columnInfo2, columnInfo3, columnInfo4);
@@ -96,11 +96,11 @@ class ColumnInfoConverterTest {
         //then
         Map<String, Property> properties = pageProperties.getProperties();
         assertEquals(3, properties.size());
-        Property richText = properties.get(columnInfo1.getName());
+        Property richText = properties.get(columnInfo1.getNameWithOrderPrefix());
         assertEquals(columnInfo1.getTextFromUser(), richText.getRichTexts().get(0).getText().getContent());
-        Property title = properties.get(columnInfo2.getName());
+        Property title = properties.get(columnInfo2.getNameWithOrderPrefix());
         assertEquals(columnInfo2.getTextFromUser(), title.getTitle().get(0).getText().getContent());
-        Property select = properties.get(columnInfo3.getName());
+        Property select = properties.get(columnInfo3.getNameWithOrderPrefix());
         assertEquals(columnInfo3.getTextFromUser(), select.getSelect().getName());
     }
 

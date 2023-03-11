@@ -1,5 +1,6 @@
 package dailysurveybot.notion.convertors;
 
+import dailysurveybot.notion.Utils;
 import dailysurveybot.notion.model.*;
 import dailysurveybot.notion.model.api.ColumnInfo;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.*;
 
+import static dailysurveybot.notion.Utils.addNameWithoutOrderDigits;
 import static dailysurveybot.notion.model.enums.PropertyType.*;
 
 @Component
@@ -18,7 +20,7 @@ public class ColumnInfoConverter {
         List<Property> properties = Objects.requireNonNull(database.getProperties()).values().stream().toList();
         for (Property property : properties) {
             ColumnInfo columnInfo = new ColumnInfo();
-            columnInfo.setName(property.getName());
+            columnInfo.setNameWithOrderPrefix(property.getName());
             columnInfo.setType(property.getType());
             if (property.getSelect() != null) {
                 List<String> selectOptions = property.getSelect().getSelectOptions()
@@ -27,6 +29,18 @@ public class ColumnInfoConverter {
             }
             columnInfoList.add(columnInfo);
         }
+
+        //TODO сделать возможность сортировки настраиваемой
+        //Сортируем колонки по названиям в соотвествии с их числовыми префиксами,
+        // вследствии того, что api notion возвращает колонки в произвольном порядке,
+        // а не так как отображает на ui на сайте notion.
+        columnInfoList.sort(Comparator.comparing(Utils::extractNameOrderFromColumnInfo));
+
+        //Убираем цифры префикса из названий чтобы пользователь при заполнении видел только необходимую информацию
+        for (ColumnInfo columnInfo : columnInfoList) {
+            addNameWithoutOrderDigits(columnInfo);
+        }
+
         return columnInfoList;
     }
 
@@ -45,7 +59,7 @@ public class ColumnInfoConverter {
             } else {
                 continue;
             }
-            propertyMap.put(columnInfo.getName(), property);
+            propertyMap.put(columnInfo.getNameWithOrderPrefix(), property);
         }
         pageProperties.setProperties(propertyMap);
         return pageProperties;
