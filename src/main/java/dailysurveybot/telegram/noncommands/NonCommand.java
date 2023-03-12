@@ -58,6 +58,7 @@ public class NonCommand {
                     answer.setText(columnInfo.getName());
                     if (SELECT.getValue().equals(columnInfo.getType())) {
                         answer.setReplyMarkup(inlineKeyboard.getInlineMessageButtons(columnInfo.getSelectOptions()));
+                        //TODO сделать сохранение информациии о клавитуре чтобы удалить её после взаимодействия пользователя
                     }
                 }
             }

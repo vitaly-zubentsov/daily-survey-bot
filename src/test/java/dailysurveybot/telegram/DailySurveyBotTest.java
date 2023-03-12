@@ -117,7 +117,7 @@ class DailySurveyBotTest {
     void getBotUsername_ReturnBotUserName() {
         //given
         String botName = "botName";
-        TelegramConfig telegramConfig = new TelegramConfig(botName, "botToken");
+        TelegramConfig telegramConfig = new TelegramConfig(botName, "botToken", 1L, 1L);
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
                 settingsCommand,
@@ -134,7 +134,7 @@ class DailySurveyBotTest {
     void getBotToken_ReturnBotToken() {
         //given
         String botToken = "botToken";
-        TelegramConfig telegramConfig = new TelegramConfig("botName", botToken);
+        TelegramConfig telegramConfig = new TelegramConfig("botName", botToken, 1L, 1L);
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
                 settingsCommand,
