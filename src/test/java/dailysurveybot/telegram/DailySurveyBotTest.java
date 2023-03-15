@@ -15,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -76,7 +77,7 @@ class DailySurveyBotTest {
 
     @Test
     @DisplayName("Получение CallbackQuery от пользователя")
-    void processNonCommandUpdate_UpdateIsCallbackQuery_sendAnswer() throws TelegramApiException {
+    void processNonCommandUpdate_UpdateIsCallbackQuery_SendAnswerClearInlineKeyboard() throws TelegramApiException {
         //given
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
@@ -110,6 +111,44 @@ class DailySurveyBotTest {
         SendMessage sendMessage = messageArgumentCaptor.getValue();
         assertEquals(answerToUser, sendMessage.getText());
         assertEquals(chatId.toString(), sendMessage.getChatId());
+    }
+
+    @Test
+    @DisplayName("Получение CallbackQuery от пользователя, проверка удаления клавитуры")
+    void processNonCommandUpdate_UpdateIsCallbackQueryCheckClearInlineKeyboard_SendAnswerClearInlineKeyboard() throws TelegramApiException {
+        //given
+        DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
+                startCommand,
+                settingsCommand,
+                helpCommand,
+                nonCommand,
+                addRowToTableCommand));
+        ArgumentCaptor<EditMessageReplyMarkup> editMessageReplyMarkupArgumentCaptor = ArgumentCaptor.forClass(EditMessageReplyMarkup.class);
+        Update update = new Update();
+        update.setCallbackQuery(new CallbackQuery());
+        String text = "text";
+        update.getCallbackQuery().setData(text);
+        update.getCallbackQuery().setFrom(new User());
+        String userName = "userName";
+        update.getCallbackQuery().getFrom().setUserName(userName);
+        Long chatId = 123L;
+        update.getCallbackQuery().setMessage(new Message());
+        update.getCallbackQuery().getMessage().setChat(new Chat());
+        update.getCallbackQuery().getMessage().getChat().setId(chatId);
+        SendMessage answer = new SendMessage();
+        when(nonCommand.execute(chatId, userName, text)).thenReturn(answer);
+        Message messageFromTelegram = new Message();
+        messageFromTelegram.setMessageId(321);
+        doReturn(messageFromTelegram).when(dailySurveyBot).execute(any(SendMessage.class));
+
+        //when
+        dailySurveyBot.processNonCommandUpdate(update);
+
+        //then
+        verify(dailySurveyBot, times(2)).execute(editMessageReplyMarkupArgumentCaptor.capture());
+        EditMessageReplyMarkup editMessageReplyMarkup = editMessageReplyMarkupArgumentCaptor.getValue();
+        assertEquals(320, editMessageReplyMarkup.getMessageId());
+        assertEquals(chatId.toString(), editMessageReplyMarkup.getChatId());
     }
 
     @Test

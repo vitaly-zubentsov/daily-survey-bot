@@ -23,7 +23,7 @@ public class Scheduler {
         this.chatId = telegramConfig.chatId();
     }
 
-    @Scheduled(cron = "0 0 22 * * *")
+    @Scheduled(cron = "0 0 18 * * *")
     public void startAddRowToTable() {
         Update update = new Update();
         User user = new User();

@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -79,7 +81,8 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
         Long chatId;
         String userName;
         String textFromUser;
-        if (update.hasCallbackQuery()) {
+        boolean isCallbackQuery = update.hasCallbackQuery();
+        if (isCallbackQuery) {
             //Получение данных при нажатии inline клавиатуры пользователем
             chatId = update.getCallbackQuery().getMessage().getChatId();
             userName = Utils.getUserName(update.getCallbackQuery().getFrom());
@@ -94,14 +97,23 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
         SendMessage answer = nonCommand.execute(chatId, userName, textFromUser);
 
         try {
-            execute(answer);
+            Message executedMessage = execute(answer);
+            if (isCallbackQuery) {
+                EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup(
+                        chatId.toString(),
+                        executedMessage.getMessageId() - 1,
+                        null,
+                        null);
+                execute(editMessageReplyMarkup);
+            }
         } catch (TelegramApiException e) {
             logger.error("Пользователь {}. Сбой при отправке сообщения в телеграмм. SendMessage {}", userName, answer);
         }
     }
 
     /**
-     * Получение настроек по id чата. Если ранее для этого чата в ходе сеанса работы бота настройки не были установлены, используются настройки по умолчанию
+     * Получение настроек по id чата.
+     * Если ранее для этого чата в ходе сеанса работы бота настройки не были установлены, используются настройки по умолчанию
      */
     public static UserData getUserData(Long chatId) {
         Map<Long, UserData> userDataMap = DailySurveyBot.getUsersData();
