@@ -3,7 +3,6 @@ package dailysurveybot.telegram;
 import dailysurveybot.config.TelegramConfig;
 import dailysurveybot.notion.model.api.ColumnInfo;
 import dailysurveybot.telegram.commands.info.HelpCommand;
-import dailysurveybot.telegram.commands.info.SettingsCommand;
 import dailysurveybot.telegram.commands.operation.AddRowToTableCommand;
 import dailysurveybot.telegram.commands.operation.StartCommand;
 import dailysurveybot.telegram.entity.UserData;
@@ -30,8 +29,6 @@ class DailySurveyBotTest {
     @Mock
     private StartCommand startCommand;
     @Mock
-    private SettingsCommand settingsCommand;
-    @Mock
     private HelpCommand helpCommand;
     @Mock
     private NonCommand nonCommand;
@@ -44,7 +41,6 @@ class DailySurveyBotTest {
         //given
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
-                settingsCommand,
                 helpCommand,
                 nonCommand,
                 addRowToTableCommand));
@@ -83,7 +79,6 @@ class DailySurveyBotTest {
         //given
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
-                settingsCommand,
                 helpCommand,
                 nonCommand,
                 addRowToTableCommand));
@@ -123,7 +118,6 @@ class DailySurveyBotTest {
         //given
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
-                settingsCommand,
                 helpCommand,
                 nonCommand,
                 addRowToTableCommand));
@@ -165,7 +159,6 @@ class DailySurveyBotTest {
         TelegramConfig telegramConfig = new TelegramConfig(botName, "botToken", 1L, 1L);
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
-                settingsCommand,
                 helpCommand,
                 nonCommand,
                 addRowToTableCommand));
@@ -182,7 +175,6 @@ class DailySurveyBotTest {
         TelegramConfig telegramConfig = new TelegramConfig("botName", botToken, 1L, 1L);
         DailySurveyBot dailySurveyBot = spy(new DailySurveyBot(telegramConfig,
                 startCommand,
-                settingsCommand,
                 helpCommand,
                 nonCommand,
                 addRowToTableCommand));

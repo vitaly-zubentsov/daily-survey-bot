@@ -19,6 +19,6 @@ public class HelpCommand extends InfoCommand {
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         String userName = Utils.getUserName(user);
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
-                "Вызываешь /t и заполняешь таблицу, чего непонятного то?");
+                "Бот предназначен для заполнения таблиц в notion, содержащих колонки текста или выпадающих спискок(select). \nДля заполнения таблицы необходимо ввести настройки, для этого вызовите команду /start. \nПосле внесения данных можно заполнять таблицу введя команду /t.\n Если требуется изменить настройки повторно вызовите команду /start");
     }
 }

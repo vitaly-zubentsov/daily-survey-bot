@@ -2,7 +2,6 @@ package dailysurveybot.telegram;
 
 import dailysurveybot.config.TelegramConfig;
 import dailysurveybot.telegram.commands.info.HelpCommand;
-import dailysurveybot.telegram.commands.info.SettingsCommand;
 import dailysurveybot.telegram.commands.operation.AddRowToTableCommand;
 import dailysurveybot.telegram.commands.operation.StartCommand;
 import dailysurveybot.telegram.entity.UserData;
@@ -39,7 +38,6 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
 
     public DailySurveyBot(TelegramConfig telegramConfig,
                           StartCommand startCommand,
-                          SettingsCommand settingsCommand,
                           HelpCommand helpCommand,
                           NonCommand nonCommand,
                           AddRowToTableCommand addRowToTableCommand) {
@@ -51,8 +49,6 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
         //регистрируем команды
         register(startCommand);
         logger.debug("Команда start была зарегистрирована");
-        register(settingsCommand);
-        logger.debug("Команда settings была зарегистрирована");
         register(helpCommand);
         logger.debug("Команда help была зарегистрирована");
         register(addRowToTableCommand);
