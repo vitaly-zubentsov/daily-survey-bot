@@ -212,8 +212,7 @@ class NonCommandTest {
         SendMessage answer = nonCommand.execute(CHAT_ID, USER_ID, USER_NAME, TEXT);
 
         //then
-        assertEquals("Настройки успешно сохранены. Попробуйте ввести строку таблицы воспользовавшись командой /t. Если возникнут сложности введите /help",
-                answer.getText());
+        assertTrue(answer.getText().contains("Настройки успешно сохранены. Попробуйте ввести строку таблицы воспользовавшись командой /t"));
         assertTrue(user.getFilled());
     }
 

@@ -86,7 +86,7 @@ public class NonCommand {
             userFromDb.setNotionApiToken(text);
             userFromDb.setFilled(true);
             userRepo.save(userFromDb);
-            answer.setText("Настройки успешно сохранены. Попробуйте ввести строку таблицы воспользовавшись командой /t. Если возникнут сложности введите /help");
+            answer.setText("Настройки успешно сохранены. Попробуйте ввести строку таблицы воспользовавшись командой /t. Если порядок при заполнении таблицы важен, то добавьте в начало названия колонки порядковый номер. Если возникнут сложности введите /help");
         } else {
             throw new FailToFillUserDbExceptions();
         }
