@@ -3,8 +3,8 @@ package dailysurveybot.telegram;
 import dailysurveybot.config.TelegramConfig;
 import dailysurveybot.telegram.commands.info.HelpCommand;
 import dailysurveybot.telegram.commands.info.SettingsCommand;
-import dailysurveybot.telegram.commands.info.StartCommand;
 import dailysurveybot.telegram.commands.operation.AddRowToTableCommand;
+import dailysurveybot.telegram.commands.operation.StartCommand;
 import dailysurveybot.telegram.entity.UserData;
 import dailysurveybot.telegram.noncommands.NonCommand;
 import org.slf4j.Logger;
@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -79,22 +80,27 @@ public class DailySurveyBot extends TelegramLongPollingCommandBot {
     @Override
     public void processNonCommandUpdate(Update update) {
         Long chatId;
+        Long userId;
         String userName;
         String textFromUser;
         boolean isCallbackQuery = update.hasCallbackQuery();
         if (isCallbackQuery) {
             //Получение данных при нажатии inline клавиатуры пользователем
             chatId = update.getCallbackQuery().getMessage().getChatId();
-            userName = Utils.getUserName(update.getCallbackQuery().getFrom());
+            User user = update.getCallbackQuery().getFrom();
+            userName = Utils.getUserName(user);
+            userId = user.getId();
             textFromUser = update.getCallbackQuery().getData();
         } else {
             //Получение данных из сообщения от пользователя
             chatId = update.getMessage().getChatId();
-            userName = Utils.getUserName(update.getMessage().getFrom());
+            User user = update.getMessage().getFrom();
+            userName = Utils.getUserName(user);
+            userId = user.getId();
             textFromUser = update.getMessage().getText();
         }
 
-        SendMessage answer = nonCommand.execute(chatId, userName, textFromUser);
+        SendMessage answer = nonCommand.execute(chatId, userId, userName, textFromUser);
 
         try {
             Message executedMessage = execute(answer);

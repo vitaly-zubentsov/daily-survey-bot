@@ -13,7 +13,7 @@
 
     <groupId>com.vitalyzubentsov.dailysurveybot</groupId>
     <artifactId>daily-survey-bot</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <name>daily-survey-bot</name>
     <description>Бот для внесения данных в таблицу notion</description>
     <packaging>jar</packaging>
@@ -52,6 +52,16 @@
             <groupId>org.telegram</groupId>
             <artifactId>telegrambotsextensions</artifactId>
             <version>${telegram.version}</version>
+        </dependency>
+        <!--db h2 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>

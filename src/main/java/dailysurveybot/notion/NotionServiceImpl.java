@@ -28,61 +28,63 @@ public class NotionServiceImpl implements NotionService {
 
     private final Logger logger = LoggerFactory.getLogger(NotionServiceImpl.class);
 
-    private final NotionConfig notionConfig;
     private final RestTemplate restTemplate;
     private final ColumnInfoConverter columnInfoConverter;
+    private final String apiUrl;
+    private final String apiVersion;
 
 
     public NotionServiceImpl(NotionConfig notionConfig,
                              RestTemplate restTemplate,
                              ColumnInfoConverter columnInfoConverter) {
-        this.notionConfig = notionConfig;
+        apiUrl = notionConfig.apiUrl();
+        apiVersion = notionConfig.apiVersion();
         this.restTemplate = restTemplate;
         this.columnInfoConverter = columnInfoConverter;
     }
 
     @Override
-    public void saveRow(@Nonnull List<ColumnInfo> columnInfoList) {
+    public void saveRow(@Nonnull List<ColumnInfo> columnInfoList, @Nonnull String databaseId, @Nonnull String apiToken) {
         logger.debug("Вызов saveRow: {}", columnInfoList);
 
-        restTemplate.exchange(notionConfig.apiUrl() + PAGES_URL,
+        restTemplate.exchange(apiUrl + PAGES_URL,
                 HttpMethod.POST,
-                new HttpEntity<>(createPage(columnInfoList), getDefaultHeaders()),
+                new HttpEntity<>(createPage(columnInfoList, databaseId), getDefaultHeaders(apiToken)),
                 Page.class);
 
         logger.debug("Завершение вызова saveRow");
     }
 
     @Override
-    public List<ColumnInfo> getColumnsInfo() {
-        String url = notionConfig.apiUrl() + DATABASES_URL + notionConfig.databaseId();
+    public List<ColumnInfo> getColumnsInfo(@Nonnull String databaseId, @Nonnull String apiToken) {
+        String url = apiUrl + DATABASES_URL + databaseId;
         logger.debug("Вызов метода getColumnsInfo. url {}", url);
 
         //Запрос на получение данных о таблице в notion
         ResponseEntity<Database> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                new HttpEntity<>(getDefaultHeaders()),
+                new HttpEntity<>(getDefaultHeaders(apiToken)),
                 Database.class);
         logger.debug("getColumnsInfo получен ответ от сервера: {}", response.getBody());
 
         return columnInfoConverter.convertDatabaseToColumnsInfoList(requireNonNull(response.getBody()));
     }
 
-    private HttpHeaders getDefaultHeaders() {
+    private HttpHeaders getDefaultHeaders(@Nonnull String apiToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Authorization", "Bearer " + notionConfig.apiToken());
-        headers.set("Notion-Version", notionConfig.apiVersion());
+        headers.set("Authorization", "Bearer " + apiToken);
+        headers.set("Notion-Version", apiVersion);
         return headers;
     }
 
-    private Page createPage(List<ColumnInfo> columnInfoList) {
+    private Page createPage(List<ColumnInfo> columnInfoList, String databaseId) {
         Page page = new Page();
 
         page.setParent(new Parent());
-        page.getParent().setDatabaseId(notionConfig.databaseId());
+        page.getParent().setDatabaseId(databaseId);
 
         PageProperties pageProperties = columnInfoConverter.convertColumnsInfoListToPageProperties(columnInfoList);
         page.setPageProperties(pageProperties);

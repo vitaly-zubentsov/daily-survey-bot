@@ -4,8 +4,8 @@ import dailysurveybot.config.TelegramConfig;
 import dailysurveybot.notion.model.api.ColumnInfo;
 import dailysurveybot.telegram.commands.info.HelpCommand;
 import dailysurveybot.telegram.commands.info.SettingsCommand;
-import dailysurveybot.telegram.commands.info.StartCommand;
 import dailysurveybot.telegram.commands.operation.AddRowToTableCommand;
+import dailysurveybot.telegram.commands.operation.StartCommand;
 import dailysurveybot.telegram.entity.UserData;
 import dailysurveybot.telegram.noncommands.NonCommand;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +55,8 @@ class DailySurveyBotTest {
         update.getMessage().setText(text);
         update.getMessage().setFrom(new User());
         String userName = "userName";
+        long userId = 321L;
+        update.getMessage().getFrom().setId(userId);
         update.getMessage().getFrom().setUserName(userName);
         update.getMessage().setChat(new Chat());
         Long chatId = 123L;
@@ -63,7 +65,7 @@ class DailySurveyBotTest {
         SendMessage answer = new SendMessage();
         answer.setText(answerToUser);
         answer.setChatId(chatId.toString());
-        when(nonCommand.execute(chatId, userName, text)).thenReturn(answer);
+        when(nonCommand.execute(chatId, userId, userName, text)).thenReturn(answer);
 
         //when
         dailySurveyBot.processNonCommandUpdate(update);
@@ -92,6 +94,8 @@ class DailySurveyBotTest {
         update.getCallbackQuery().setData(text);
         update.getCallbackQuery().setFrom(new User());
         String userName = "userName";
+        long userId = 321L;
+        update.getCallbackQuery().getFrom().setId(userId);
         update.getCallbackQuery().getFrom().setUserName(userName);
         Long chatId = 123L;
         update.getCallbackQuery().setMessage(new Message());
@@ -101,7 +105,7 @@ class DailySurveyBotTest {
         SendMessage answer = new SendMessage();
         answer.setText(answerToUser);
         answer.setChatId(chatId.toString());
-        when(nonCommand.execute(chatId, userName, text)).thenReturn(answer);
+        when(nonCommand.execute(chatId, userId, userName, text)).thenReturn(answer);
 
         //when
         dailySurveyBot.processNonCommandUpdate(update);
@@ -131,12 +135,14 @@ class DailySurveyBotTest {
         update.getCallbackQuery().setFrom(new User());
         String userName = "userName";
         update.getCallbackQuery().getFrom().setUserName(userName);
+        long userId = 321L;
+        update.getCallbackQuery().getFrom().setId(userId);
         Long chatId = 123L;
         update.getCallbackQuery().setMessage(new Message());
         update.getCallbackQuery().getMessage().setChat(new Chat());
         update.getCallbackQuery().getMessage().getChat().setId(chatId);
         SendMessage answer = new SendMessage();
-        when(nonCommand.execute(chatId, userName, text)).thenReturn(answer);
+        when(nonCommand.execute(chatId, userId, userName, text)).thenReturn(answer);
         Message messageFromTelegram = new Message();
         messageFromTelegram.setMessageId(321);
         doReturn(messageFromTelegram).when(dailySurveyBot).execute(any(SendMessage.class));

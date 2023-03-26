@@ -6,11 +6,11 @@ import dailysurveybot.notion.model.Database;
 import dailysurveybot.notion.model.Page;
 import dailysurveybot.notion.model.PageProperties;
 import dailysurveybot.notion.model.api.ColumnInfo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.*;
@@ -28,7 +28,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NotionServiceImplTest {
 
-    @InjectMocks
+    private static final String DATABASE_ID = "databaseId";
+    private static final String API_TOKEN = "apiToken";
+
     private NotionServiceImpl notionService;
     @Mock
     private RestTemplate restTemplate;
@@ -36,6 +38,13 @@ class NotionServiceImplTest {
     private NotionConfig notionConfig;
     @Mock
     private ColumnInfoConverter columnInfoConverter;
+
+    @BeforeEach
+    void init() {
+        when(notionConfig.apiUrl()).thenReturn("https://url.ru/");
+        when(notionConfig.apiVersion()).thenReturn("version");
+        notionService = new NotionServiceImpl(notionConfig, restTemplate, columnInfoConverter);
+    }
 
     @Test
     @DisplayName("Получение списка колонок")
@@ -45,14 +54,10 @@ class NotionServiceImplTest {
         ResponseEntity<Database> response = new ResponseEntity<>(new Database(), HttpStatus.ACCEPTED);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(Database.class)))
                 .thenReturn(response);
-        when(notionConfig.apiUrl()).thenReturn("https://url.ru/");
-        when(notionConfig.databaseId()).thenReturn("databaseId");
-        when(notionConfig.apiToken()).thenReturn("token");
-        when(notionConfig.apiVersion()).thenReturn("version");
         when(columnInfoConverter.convertDatabaseToColumnsInfoList(any())).thenReturn(List.of(new ColumnInfo()));
 
         //when
-        List<ColumnInfo> columnsInfo = notionService.getColumnsInfo();
+        List<ColumnInfo> columnsInfo = notionService.getColumnsInfo(DATABASE_ID, API_TOKEN);
 
         //then
         verify(restTemplate, only()).exchange(eq("https://url.ru/databases/databaseId"),
@@ -62,24 +67,21 @@ class NotionServiceImplTest {
         HttpHeaders headers = argumentCaptor.getValue().getHeaders();
         assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
         assertEquals(Collections.singletonList(MediaType.APPLICATION_JSON), headers.getAccept());
-        assertEquals("Bearer token", headers.get("Authorization").get(0));
+        assertEquals("Bearer apiToken", headers.get("Authorization").get(0));
         assertEquals("version", headers.get("Notion-Version").get(0));
         assertNotNull(columnsInfo);
     }
 
+    @Test
     @DisplayName("Получение списка колонок, ответ не содержиит body")
     void getColumnsInfo_ResponseBodyNull_ReturnColumns() {
         //given
         ResponseEntity<Database> response = new ResponseEntity<>(null, HttpStatus.ACCEPTED);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(Database.class)))
                 .thenReturn(response);
-        when(notionConfig.apiUrl()).thenReturn("https://url.ru/");
-        when(notionConfig.databaseId()).thenReturn("databaseId");
-        when(notionConfig.apiToken()).thenReturn("token");
-        when(notionConfig.apiVersion()).thenReturn("version");
 
         //when //then
-        assertThrows(NullPointerException.class, () -> notionService.getColumnsInfo());
+        assertThrows(NullPointerException.class, () -> notionService.getColumnsInfo(DATABASE_ID, API_TOKEN));
     }
 
     @Test
@@ -87,13 +89,10 @@ class NotionServiceImplTest {
     void saveRow() {
         //given
         ArgumentCaptor<HttpEntity> argumentCaptor = ArgumentCaptor.forClass(HttpEntity.class);
-        when(notionConfig.apiUrl()).thenReturn("https://url.ru/");
-        when(notionConfig.apiToken()).thenReturn("token");
-        when(notionConfig.apiVersion()).thenReturn("version");
         when(columnInfoConverter.convertColumnsInfoListToPageProperties(any())).thenReturn(new PageProperties());
 
         //when
-        notionService.saveRow(List.of(new ColumnInfo()));
+        notionService.saveRow(List.of(new ColumnInfo()), DATABASE_ID, API_TOKEN);
 
         //then
         verify(restTemplate, only()).exchange(eq("https://url.ru/pages"),
@@ -103,7 +102,7 @@ class NotionServiceImplTest {
         HttpHeaders headers = argumentCaptor.getValue().getHeaders();
         assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
         assertEquals(Collections.singletonList(MediaType.APPLICATION_JSON), headers.getAccept());
-        assertEquals("Bearer token", headers.get("Authorization").get(0));
+        assertEquals("Bearer apiToken", headers.get("Authorization").get(0));
         assertEquals("version", headers.get("Notion-Version").get(0));
         assertTrue(argumentCaptor.getValue().hasBody());
     }
